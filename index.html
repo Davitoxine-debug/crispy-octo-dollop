@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pre-QOR:Aterrizaje Ecuador 2026 — Foco, Coraje y Continuidad</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #f0f2f5; color: #1a1a2e; }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #e8eaf6; }
+  ::-webkit-scrollbar-thumb { background: #5c6bc0; border-radius: 4px; }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideInLeft { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+  .animate-fadeInUp { animation: fadeInUp 0.6s ease-out forwards; }
+  .animate-fadeIn { animation: fadeIn 0.5s ease-out forwards; }
+  .animate-slideInLeft { animation: slideInLeft 0.5s ease-out forwards; }
+  .stagger-1 { animation-delay: 0.1s; opacity: 0; }
+  .stagger-2 { animation-delay: 0.2s; opacity: 0; }
+  .stagger-3 { animation-delay: 0.3s; opacity: 0; }
+  .stagger-4 { animation-delay: 0.4s; opacity: 0; }
+  .stagger-5 { animation-delay: 0.5s; opacity: 0; }
+  .stagger-6 { animation-delay: 0.6s; opacity: 0; }
+  .stagger-7 { animation-delay: 0.7s; opacity: 0; }
+  .stagger-8 { animation-delay: 0.8s; opacity: 0; }
+</style>
+
+<style>
+#lock {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-family: Inter, sans-serif;
+  z-index: 9999;
+}
+#lock input, #lock button {
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+#lock button {
+  background: #1565c0;
+  color: white;
+  border: none;
+}
+</style>
+
+</head>
+<body>
+
+<div id="lock">
+  <h2>🔒 Acceso restringido</h2>
+  <input type="password" id="pass" placeholder="Contraseña">
+  <button onclick="unlock()">Entrar</button>
+</div>
+
+<div id="root"></div>
+<script type="text/babel">
+
+const { useState, useEffect, useRef } = React;
+
+/* ───────── COLOR PALETTE ───────── */
+const C = {
+  navy: '#1a237e', blue: '#1565c0', lightBlue: '#42a5f5', skyBlue: '#e3f2fd',
+  gold: '#f9a825', amber: '#ff8f00', red: '#c62828', redLight: '#ffebee',
+  green: '#2e7d32', greenLight: '#e8f5e9', orange: '#ef6c00', orangeLight: '#fff3e0',
+  purple: '#6a1b9a', purpleLight: '#f3e5f5', gray: '#546e7a', grayLight: '#eceff1',
+  white: '#ffffff', bg: '#f5f6fa', dark: '#0d1b2a',
+};
+
+/* ───────── TABS CONFIG ───────── */
+const TABS = [
+  { id: 'overview', icon: '🧭', label: 'Visión General' },
+  { id: 'agenda', icon: '📋', label: 'Agenda' },
+  { id: 'diagnosis', icon: '🩺', label: 'Diagnóstico' },
+  { id: 'targets', icon: '🎯', label: 'Targets de Zona' },
+  { id: 'participants', icon: '👥', label: 'Participantes' },
+  { id: 'playbook', icon: '📘', label: 'Playbook' },
+  { id: 'prework', icon: '✅', label: 'Pre-Work' },
+];
+
+/* ───────── DATA ───────── */
+const AGENDA_BLOCKS = [
+  {
+    time: '08:00 — 08:50', duration: '50 min', title: 'Contexto y Verdad', icon: '🧭',
+    color: C.blue, lightColor: C.skyBlue, block: 'BLOQUE 1',
+    items: [
+      { t: '5 min', d: 'Check-in — Una palabra: ¿cómo llego hoy?' },
+      { t: '15 min', d: 'Apertura de Josué — Sin slides, desde el corazón' },
+      { t: '15 min', d: 'Targets de Zona — Nuevos objetivos y gatekeepers' },
+      { t: '15 min', d: 'El elefante en la sala — Cambios organizacionales y continuidad' },
+    ]
+  },
+  {
+    time: '08:50 — 10:20', duration: '90 min', title: 'Lo que nos Duele', icon: '🩺',
+    color: C.green, lightColor: C.greenLight, block: 'BLOQUE 2',
+    items: [
+      { t: '30 min', d: 'Mesa 1: Market Share & Competitividad de Precios' },
+      { t: '30 min', d: 'Mesa 2: Overdues, Inventarios, RTM y Working Capital' },
+      { t: '30 min', d: 'Mesa 3: Sell Out, COP1 y Política Comercial' },
+    ]
+  },
+  {
+    time: '10:20 — 10:35', duration: '15 min', title: 'Break', icon: '☕',
+    color: C.gray, lightColor: C.grayLight, block: 'PAUSA',
+    items: [{ t: '', d: 'Café y recalibración entre facilitadores' }]
+  },
+  {
+    time: '10:35 — 12:00', duration: '85 min', title: 'Conversaciones con Coraje', icon: '🔥',
+    color: C.red, lightColor: C.redLight, block: 'BLOQUE 3',
+    items: [
+      { t: '25 min', d: 'Ronda de verdades incómodas — Lo que no nos estamos diciendo' },
+      { t: '30 min', d: 'Mapa de riesgos de continuidad — Personas × Iniciativas' },
+      { t: '30 min', d: 'Decisiones postergadas — ¿La tomamos hoy o agendamos?' },
+    ]
+  },
+  {
+    time: '12:00 — 13:00', duration: '60 min', title: 'Almuerzo', icon: '🍽️',
+    color: C.gray, lightColor: C.grayLight, block: 'ALMUERZO',
+    items: [{ t: '', d: 'Espacio de descompresión y conversación libre' }]
+  },
+  {
+    time: '13:00 — 13:50', duration: '50 min', title: 'Plan de Aterrizaje / Playbook', icon: '📘',
+    color: C.purple, lightColor: C.purpleLight, block: 'BLOQUE 4',
+    items: [
+      { t: '10 min', d: 'Priorización de las 8 iniciativas críticas' },
+      { t: '25 min', d: 'Construcción del Playbook en tríos de trabajo' },
+      { t: '15 min', d: 'Asignación de dueños y custodios de respaldo' },
+    ]
+  },
+  {
+    time: '13:50 — 14:05', duration: '15 min', title: 'Compromisos y Cierre', icon: '🤝',
+    color: C.gold, lightColor: '#fff8e1', block: 'BLOQUE 5',
+    items: [
+      { t: '10 min', d: 'Ronda de compromiso: "Mi compromiso con este equipo…"' },
+      { t: '5 min', d: 'Cierre de Josué y firma simbólica del Playbook' },
+    ]
+  },
+];
+
+const PAIN_POINTS = [
+  { id: 1, title: 'MASH negativo sostenido', severity: 'red', icon: '📉',
+    quote: '"Otro mes con MASH negativo, esto es algo frustrante ya que no se corona nuestro esfuerzo en un mercado de guerra de precios."',
+    detail: 'El market share continúa en terreno negativo mes tras mes. A pesar de los ajustes en SRM y mejoras en canal Moderno, los resultados agregados no reflejan el esfuerzo. La guerra de precios en el mercado erosiona las posiciones ganadas.' },
+  { id: 2, title: 'Competitividad de precios', severity: 'red', icon: '🏷️',
+    quote: '"Recuperar competitividad en precios en Moderno y en los price points clave en Tradicional."',
+    detail: 'En canal Moderno se necesita consolidar el modelo de competitividad de precios vía SRM, protegiendo margen. En Tradicional, los price points clave no están donde deberían estar, generando fuga hacia competidores.' },
+  { id: 3, title: 'Overdues e inventarios fuera de control', severity: 'red', icon: '📦',
+    quote: '"Normalizar inventarios y Overdues en TSP y sostener la disciplina en ASSR."',
+    detail: 'Stock in trade debe bajar de 58 a 46 días (y de 76 a 45 en TSP & Élite). Overdues NiM deben llegar a 14.3% de Trade Receivables. Working Capital debe alcanzar 10.6% de NNS (-430 bps vs Dic 2025).' },
+  { id: 4, title: 'RTM en estabilización', severity: 'yellow', icon: '🛣️',
+    quote: '"La transformación comenzó hace un par de años y hemos avanzado muchísimo, pero ahora necesitamos consolidarla con foco, simplicidad y excelencia en ejecución."',
+    detail: 'El Route to Market lleva 2 años de transformación. Se simplificó la red de distribuidores, se especializó la fuerza de venta, se integró BEES. Pero el modelo aún no se consolida: falta estandarización, masa crítica en algunos distribuidores, y disciplina de ejecución.' },
+  { id: 5, title: 'Modelo Sell Out aún no aterrizado', severity: 'yellow', icon: '📊',
+    quote: '"Consolidar Élite 2.0 y fortalecer nuestro modelo de TSPs, reduciendo overdues y creciendo a través del sell-out."',
+    detail: 'El giro de Sell In a Sell Out es la transformación más profunda. Élite 2.0, TSPs con remuneración variable por surtido infaltable, y la foto de éxito integral de tienda necesitan consistencia y disciplina sostenida.' },
+  { id: 6, title: 'Rentabilidad (COP1) desafiante', severity: 'yellow', icon: '💰',
+    quote: '"El COP1 es desafiante, pero sinceramente creo que podemos aspirar a un COP1 del 50%. La rentabilidad es un desafío, pero tenemos que acercarnos al 50% y mantener el piso en 18,6."',
+    detail: 'Target de Zona: COP1 al 20.9% para 100% achievement. Gatekeeper de PFME en 8.6% de NNS. Las palancas: Gross Margin improvement, Fuel for Growth savings (MAGUIRE & SIMPLEX), reducción de costos estructurales y disciplina en PFME.' },
+  { id: 7, title: 'Alineación del equipo', severity: 'yellow', icon: '🤝',
+    quote: '"La transformación y estabilización de nuestro modelo no es responsabilidad de una sola área. Es responsabilidad de todos. Necesitamos involucrarnos, colaborar y actuar como un solo equipo."',
+    detail: 'Josué percibe silos funcionales. La transformación requiere máxima alineación, colaboración y consistencia. Menos complejidad, más claridad. Menos ruido, más foco. El contexto de cambios organizacionales hace esto aún más urgente.' },
+];
+
+const TARGETS_DATA = [
+  { measure: 'OG', scope: 'LMB', unit: '%', v0: '-3.8%', v50: '-2.8%', v100: '-1.8%', v150: '-0.8%', weight: '50%' },
+  { measure: 'RIG', scope: 'LMB', unit: '%', v0: '', v50: '', v100: 'Gatekeeper -2.9%', v150: '', weight: '—' },
+  { measure: 'COP1', scope: 'LMB', unit: '%', v0: '20.1%', v50: '20.5%', v100: '20.9%', v150: '21.3%', weight: '30%' },
+  { measure: 'PFME', scope: 'LMB', unit: '%', v0: '', v50: '', v100: 'Gatekeeper 8.6%', v150: '', weight: '—' },
+  { measure: 'Costos Estr.', scope: 'LMB', unit: 'bps', v0: '-16', v50: '-32', v100: '-47', v150: '-63', weight: '10%' },
+  { measure: 'Market Share', scope: 'bps', unit: 'bps', v0: '', v50: '', v100: 'Variable por gap', v150: '+150', weight: '10%' },
+];
+
+const GATEKEEPERS = [
+  { icon: '📊', title: 'Sell Out F&B', value: '+2.7% Full Year', detail: '+5.6% F&B excl. Terrafertil' },
+  { icon: '📦', title: 'Stock in Trade', value: '58 → 46 días', detail: 'TSP & Élite: 76 → 45 días' },
+  { icon: '💳', title: 'Overdues NiM', value: '14.3%', detail: 'De Trade Receivables a Dic 2026 / Avg H2 < 15%' },
+  { icon: '🏦', title: 'Working Capital', value: '10.6% de NNS', detail: '-430 bps vs Dic 2025' },
+  { icon: '🌿', title: 'Terrafertil Branded', value: 'OG ≥ -8.0%', detail: 'Gatekeeper branded portfolio' },
+];
+
+const PARTICIPANTS = [
+  { name: 'Josué De la Maza', role: 'Market Head', area: 'General Management', badge: null, warning: false, color: C.navy },
+  { name: 'Tadeu Freitas', role: 'Head of Sales', area: 'Sales', badge: null, warning: true, color: C.red },
+  { name: 'Andres Chamorro', role: 'BEO Café & CMB', area: 'General Management', badge: null, warning: false, color: C.blue },
+  { name: 'Teodor Kamenov', role: 'BEO Confectionery', area: 'General Management', badge: null, warning: false, color: C.blue },
+  { name: 'Jorge Penaherrera', role: 'BEO Culinary', area: 'General Management', badge: null, warning: false, color: C.blue },
+  { name: 'Maria Victoria Quiñones', role: 'BU Manager Terrafertil', area: 'Finance & Control', badge: null, warning: false, color: C.green },
+  { name: 'Eduardo Figueiredo', role: 'Head of F&C', area: 'Co-Pilot / Finance', badge: null, warning: false, color: C.green },
+  { name: 'Daniel Martinez', role: 'Head of Supply Chain', area: 'Supply Chain', badge: null, warning: false, color: C.orange },
+  { name: 'Melina Andrade', role: 'Head of Technical', area: 'Manufacturing', badge: null, warning: false, color: C.orange },
+  { name: 'Lucia Chavez', role: 'Head of HR', area: 'Human Resources', badge: 'Co-facilitadora', warning: false, color: C.gold },
+  { name: 'Juan Cevallos', role: 'Legal Director', area: 'Legal', badge: null, warning: false, color: C.gray },
+  { name: 'Monica Jaramillo', role: 'Sr. CSV & Corporate Affairs', area: 'Compliance', badge: null, warning: false, color: C.gray },
+  { name: 'Juan Velandia', role: 'Head of IT & Digital', area: 'IT & Digital', badge: 'Facilitador principal', warning: false, color: C.gold },
+];
+
+const INITIATIVES = [
+  { id: 1, emoji: '🏷️', title: 'Competitividad de Precios', subtitle: 'Moderno + Tradicional', target: 'MASH +150 bps / 10% peso', owner: 'Tadeu + BEOs', risk: 'ALTO', riskColor: C.red, desc: 'Consolidar modelo SRM en Moderno. Ajustar price points clave en Tradicional. Proteger margen mientras se recupera share.' },
+  { id: 2, emoji: '📦', title: 'Normalización Overdues e Inventarios', subtitle: '', target: 'Stock 58→46 días; Overdues 14.3%', owner: 'Tadeu + Eduardo', risk: 'ALTO', riskColor: C.red, desc: 'TSP & Élite de 76 a 45 días. Overdues NiM a 14.3% de TR. Working Capital a 10.6% de NNS.' },
+  { id: 3, emoji: '🛣️', title: 'Estabilización RTM y Élite 2.0', subtitle: '', target: 'Sell Out F&B +2.7% / +5.6%', owner: 'Tadeu', risk: 'ALTO', riskColor: C.red, desc: 'Consolidar nuevo modelo de distribuidores. Estandarizar gestión con BEES. Fortalecer Élite 2.0 y TSPs.' },
+  { id: 4, emoji: '📊', title: 'Modelo Sell Out y Ejecución en PDV', subtitle: '', target: 'Sell Out gatekeeper', owner: 'Tadeu + Viviana', risk: 'ALTO', riskColor: C.red, desc: 'Ejecutar con excelencia en pareto de tiendas. Surtido infaltable. Foto de éxito integral. Remuneración variable.' },
+  { id: 5, emoji: '💰', title: 'Rentabilidad y COP1', subtitle: '', target: 'COP1 20.9% / PFME 8.6%', owner: 'Eduardo + BEOs', risk: 'MEDIO', riskColor: C.amber, desc: 'Mejorar Gross Margin. Fuel for Growth savings MAGUIRE & SIMPLEX. Disciplina en PFME. Piso en 18.6%.' },
+  { id: 6, emoji: '🏗️', title: 'Costos Estructurales', subtitle: '', target: '-47 bps (FFOH + MOGEs)', owner: 'Eduardo + Melina', risk: 'MEDIO', riskColor: C.amber, desc: 'Reducir FFOH y MOGEs. Proyectos MAGUIRE y SIMPLEX 2.0. Eficiencias en cadena de valor. Sinergias NBS.' },
+  { id: 7, emoji: '📜', title: 'Política Comercial entre Canales', subtitle: '', target: 'Sostenibilidad de márgenes', owner: 'Tadeu + BEOs + Viviana', risk: 'ALTO', riskColor: C.red, desc: 'Establecer y sostener política comercial saludable. Disciplina promocional. Reducir conflicto de precios entre canales.' },
+  { id: 8, emoji: '🌿', title: 'Terrafertil Branded Portfolio', subtitle: '', target: 'OG gatekeeper -8.0%', owner: 'Maria Victoria', risk: 'BAJO', riskColor: C.green, desc: 'Asegurar OG del portafolio branded por encima del gatekeeper. Integración efectiva con LMB.' },
+];
+
+/* ───────── COMPONENTS ───────── */
+
+function Header() {
+  return (
+    <div style={{
+      background: `linear-gradient(135deg, ${C.dark} 0%, ${C.navy} 40%, ${C.blue} 100%)`,
+      color: C.white, padding: '48px 24px 36px', textAlign: 'center', position: 'relative', overflow: 'hidden'
+    }}>
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.05,
+        backgroundImage: 'radial-gradient(circle at 20% 80%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)',
+        backgroundSize: '60px 60px' }} />
+      <div style={{ position: 'relative', zIndex: 1, maxWidth: 900, margin: '0 auto' }}>
+        <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase', color: C.gold, marginBottom: 12 }}>
+          Nestlé Ecuador · MANCOM · Sesión Estratégica
+        </div>
+        <h1 style={{ fontSize: 'clamp(28px, 5vw, 48px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 8 }}>
+          Pre-QOR: Aterrizaje Ecuador 2026
+        </h1>
+        <div style={{ fontSize: 'clamp(16px, 3vw, 24px)', fontWeight: 300, opacity: 0.9, marginBottom: 20 }}>
+          Foco · Coraje · Continuidad
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 24, flexWrap: 'wrap', fontSize: 14, opacity: 0.8 }}>
+          <span>📅 27 de Mayo 2026</span>
+          <span>⏰ 8.30AM - 2.30PM</span>
+          <span>📍 Quito, Ecuador</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TabBar({ activeTab, setActiveTab }) {
+  return (
+    <div style={{
+      position: 'sticky', top: 0, zIndex: 100, background: C.white,
+      borderBottom: `2px solid ${C.skyBlue}`,
+      boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+    }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', overflowX: 'auto', padding: '0 8px' }}>
+        {TABS.map(tab => (
+          <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
+            padding: '14px 16px', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
+            fontSize: 13, fontWeight: activeTab === tab.id ? 700 : 500, fontFamily: 'Inter, sans-serif',
+            color: activeTab === tab.id ? C.navy : C.gray,
+            background: activeTab === tab.id ? C.skyBlue : 'transparent',
+            borderBottom: activeTab === tab.id ? `3px solid ${C.blue}` : '3px solid transparent',
+            transition: 'all 0.3s ease',
+          }}>
+            {tab.icon} {tab.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ icon, value, label, delay }) {
+  return (
+    <div className={`animate-fadeInUp stagger-${delay}`} style={{
+      background: C.white, borderRadius: 16, padding: '28px 20px', textAlign: 'center',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.06)', flex: '1 1 200px', minWidth: 180,
+      border: `1px solid ${C.skyBlue}`, transition: 'transform 0.3s, box-shadow 0.3s',
+    }}
+    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(21,101,192,0.15)'; }}
+    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.06)'; }}
+    >
+      <div style={{ fontSize: 36, marginBottom: 8 }}>{icon}</div>
+      <div style={{ fontSize: 32, fontWeight: 800, color: C.navy }}>{value}</div>
+      <div style={{ fontSize: 14, color: C.gray, marginTop: 4 }}>{label}</div>
+    </div>
+  );
+}
+
+function OverviewTab() {
+  return (
+    <div className="animate-fadeIn" style={{ maxWidth: 1000, margin: '0 auto' }}>
+      <div style={{ textAlign: 'center', marginBottom: 40 }}>
+        <h2 style={{ fontSize: 28, fontWeight: 800, color: C.navy, marginBottom: 12 }}>¿Por qué esta sesión?</h2>
+        <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', maxWidth: 700, margin: '0 auto' }}>
+          Tenemos nuevos targets de Zona que son retadores, un mercado que nos exige competitividad y ejecución, y un contexto de <strong>cambios organizacionales</strong> que requiere que dejemos un plan sólido que cualquier persona pueda tomar y ejecutar.
+        </p>
+      </div>
+
+      <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 40 }}>
+        <StatCard icon="⏱️" value="5h" label="De sesión estratégica" delay={1} />
+        <StatCard icon="🎯" value="8" label="Iniciativas críticas" delay={2} />
+        <StatCard icon="👥" value="15" label="Participantes MANCOM" delay={3} />
+      </div>
+
+      <div className="animate-fadeInUp stagger-4" style={{
+        background: `linear-gradient(135deg, ${C.navy}, ${C.blue})`,
+        borderRadius: 16, padding: '32px 36px', color: C.white, marginBottom: 32, position: 'relative', overflow: 'hidden'
+      }}>
+        <div style={{ position: 'absolute', top: -20, right: -20, fontSize: 120, opacity: 0.08 }}>💬</div>
+        <div style={{ fontSize: 20, fontStyle: 'italic', lineHeight: 1.6, position: 'relative', zIndex: 1 }}>
+          "Donde ponemos la mira fluye la energía, y donde enfocamos nuestra energía, las cosas crecen día con día."
+        </div>
+        <div style={{ marginTop: 12, fontSize: 14, fontWeight: 600, color: C.gold }}>— Josué De la Maza, Market Head Ecuador</div>
+      </div>
+
+      <div className="animate-fadeInUp stagger-5" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+        {[
+          { icon: '📊', title: 'Targets retadores de la Zona', desc: 'OG al -1.8%, COP1 al 20.9%, costos estructurales -47 bps, y gatekeepers exigentes en Sell Out, Inventarios y Overdues.' },
+          { icon: '🔄', title: 'Cambios organizacionales', desc: 'Líderes clave podrían ser asignados a otros mercados. Necesitamos un plan que trascienda a las personas.' },
+          { icon: '📘', title: 'Playbook de continuidad', desc: 'El output será un plan ejecutable con dueños, custodios de respaldo, hitos y riesgos documentados.' },
+        ].map((c, i) => (
+          <div key={i} style={{
+            background: C.white, borderRadius: 12, padding: 24, boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
+            borderLeft: `4px solid ${C.blue}`, transition: 'transform 0.3s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.transform = 'translateX(4px)'}
+          onMouseLeave={e => e.currentTarget.style.transform = 'translateX(0)'}
+          >
+            <div style={{ fontSize: 28, marginBottom: 8 }}>{c.icon}</div>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: C.navy, marginBottom: 8 }}>{c.title}</h3>
+            <p style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{c.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="animate-fadeInUp stagger-6" style={{
+        marginTop: 32, background: C.white, borderRadius: 12, padding: 24,
+        boxShadow: '0 2px 12px rgba(0,0,0,0.05)', borderLeft: `4px solid ${C.gold}`
+      }}>
+        <h3 style={{ fontSize: 16, fontWeight: 700, color: C.navy, marginBottom: 12 }}>🎯 Objetivo de la sesión</h3>
+        <p style={{ fontSize: 14, color: '#555', lineHeight: 1.7 }}>
+          Analizar la situación actual con honestidad, tomar las decisiones que hemos postergado, y construir un <strong>Playbook de Continuidad</strong> que garantice aterrizar toda la transformación que hemos venido haciendo — independientemente de quién esté o no esté mañana.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function AgendaTab() {
+  const [expandedBlock, setExpandedBlock] = useState(null);
+  return (
+    <div className="animate-fadeIn" style={{ maxWidth: 800, margin: '0 auto' }}>
+      <h2 style={{ fontSize: 28, fontWeight: 800, color: C.navy, textAlign: 'center', marginBottom: 8 }}>Agenda del Día</h2>
+      <p style={{ textAlign: 'center', color: C.gray, marginBottom: 32, fontSize: 14 }}>8:00 AM — 2:05 PM · 5 horas de sesión + 1 hora de almuerzo</p>
+
+      <div style={{ position: 'relative', paddingLeft: 40 }}>
+        <div style={{ position: 'absolute', left: 18, top: 0, bottom: 0, width: 3, background: `linear-gradient(to bottom, ${C.blue}, ${C.purple}, ${C.gold})`, borderRadius: 2 }} />
+
+        {AGENDA_BLOCKS.map((block, i) => {
+          const isExpanded = expandedBlock === i;
+          return (
+            <div key={i} className={`animate-slideInLeft stagger-${i+1}`} style={{ marginBottom: 16, position: 'relative' }}>
+              <div style={{
+                position: 'absolute', left: -32, top: 16, width: 26, height: 26, borderRadius: '50%',
+                background: block.color, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 12, color: C.white, fontWeight: 700, border: `3px solid ${C.white}`,
+                boxShadow: `0 0 0 2px ${block.color}40`
+              }}>{block.icon}</div>
+
+              <div onClick={() => setExpandedBlock(isExpanded ? null : i)} style={{
+                background: C.white, borderRadius: 12, overflow: 'hidden', cursor: 'pointer',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: `1px solid ${isExpanded ? block.color + '40' : '#e8e8e8'}`,
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)'}
+              onMouseLeave={e => e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', padding: '16px 20px', gap: 16 }}>
+                  <div style={{
+                    background: block.lightColor, color: block.color, padding: '6px 12px',
+                    borderRadius: 8, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap',
+                  }}>{block.block}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: C.navy }}>{block.title}</div>
+                    <div style={{ fontSize: 12, color: C.gray }}>{block.time} · {block.duration}</div>
+                  </div>
+                  <div style={{
+                    fontSize: 20, transition: 'transform 0.3s',
+                    transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)'
+                  }}>▾</div>
+                </div>
+
+                {isExpanded && (
+                  <div style={{ padding: '0 20px 16px', background: block.lightColor + '30', borderTop: `1px solid ${block.lightColor}` }}>
+                    {block.items.map((item, j) => (
+                      <div key={j} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '10px 0',
+                        borderBottom: j < block.items.length - 1 ? '1px solid rgba(0,0,0,0.06)' : 'none'
+                      }}>
+                        {item.t && <span style={{
+                          background: block.color + '15', color: block.color, padding: '3px 8px',
+                          borderRadius: 6, fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap', marginTop: 2
+                        }}>{item.t}</span>}
+                        <span style={{ fontSize: 14, color: '#444', lineHeight: 1.5 }}>{item.d}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function DiagnosisTab() {
+  const [expanded, setExpanded] = useState(null);
+  return (
+    <div className="animate-fadeIn" style={{ maxWidth: 900, margin: '0 auto' }}>
+      <h2 style={{ fontSize: 28, fontWeight: 800, color: C.navy, textAlign: 'center', marginBottom: 8 }}>Lo que le duele a Josué</h2>
+      <p style={{ textAlign: 'center', color: C.gray, marginBottom: 32, fontSize: 14 }}>7 áreas de preocupación identificadas en sus mensajes al equipo</p>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {PAIN_POINTS.map((pp, i) => {
+          const isOpen = expanded === i;
+          const sevColor = pp.severity === 'red' ? C.red : C.amber;
+          return (
+            <div key={pp.id} className={`animate-fadeInUp stagger-${i+1}`}
+              onClick={() => setExpanded(isOpen ? null : i)}
+              style={{
+                background: C.white, borderRadius: 12, overflow: 'hidden', cursor: 'pointer',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)', border: `1px solid ${isOpen ? sevColor + '40' : '#e8e8e8'}`,
+                borderLeft: `5px solid ${sevColor}`, transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)'}
+              onMouseLeave={e => e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.05)'}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', padding: '16px 20px', gap: 16 }}>
+                <div style={{ fontSize: 28 }}>{pp.icon}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: C.navy }}>{pp.title}</span>
+                    <span style={{
+                      background: sevColor + '18', color: sevColor, padding: '2px 10px',
+                      borderRadius: 20, fontSize: 11, fontWeight: 700
+                    }}>{pp.severity === 'red' ? '🔴 CRÍTICO' : '🟡 ALERTA'}</span>
+                  </div>
+                </div>
+                <div style={{ fontSize: 20, transition: 'transform 0.3s', transform: isOpen ? 'rotate(180deg)' : 'rotate(0)' }}>▾</div>
+              </div>
+
+              {isOpen && (
+                <div style={{ padding: '0 20px 20px' }}>
+                  <div style={{
+                    background: sevColor + '08', borderRadius: 8, padding: 16, marginBottom: 12,
+                    borderLeft: `3px solid ${sevColor}`, fontStyle: 'italic', fontSize: 14, color: '#555', lineHeight: 1.6
+                  }}>
+                    {pp.quote}
+                  </div>
+                  <p style={{ fontSize: 14, color: '#444', lineHeight: 1.7 }}>{pp.detail}</p>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function TargetsTab() {
+  return (
+    <div className="animate-fadeIn" style={{ maxWidth: 1000, margin: '0 auto' }}>
+      <h2 style={{ fontSize: 28, fontWeight: 800, color: C.navy, textAlign: 'center', marginBottom: 8 }}>2026 Revised Final Bonusable Targets</h2>
+      <p style={{ textAlign: 'center', color: C.gray, marginBottom: 32, fontSize: 14 }}>Carta de Jeff Hamilton, Zone AMS CEO · 21 de mayo 2026</p>
+
+      <div className="animate-fadeInUp stagger-1" style={{
+        background: C.white, borderRadius: 12, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', marginBottom: 32
+      }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+            <thead>
+              <tr style={{ background: C.navy, color: C.white }}>
+                {['Medida', 'Scope', 'Unit', '0%', '50%', '100%', '150%', 'Peso'].map(h => (
+                  <th key={h} style={{ padding: '14px 12px', textAlign: 'center', fontWeight: 700, fontSize: 12 }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {TARGETS_DATA.map((row, i) => (
+                <tr key={i} style={{ background: i % 2 === 0 ? C.white : C.skyBlue + '30', borderBottom: '1px solid #e8e8e8' }}>
+                  <td style={{ padding: '12px', fontWeight: 700, color: C.navy }}>{row.measure}</td>
+                  <td style={{ padding: '12px', textAlign: 'center', color: C.gray }}>{row.scope}</td>
+                  <td style={{ padding: '12px', textAlign: 'center', color: C.gray }}>{row.unit}</td>
+                  <td style={{ padding: '12px', textAlign: 'center' }}>{row.v0}</td>
+                  <td style={{ padding: '12px', textAlign: 'center' }}>{row.v50}</td>
+                  <td style={{ padding: '12px', textAlign: 'center', fontWeight: 700, color: C.blue }}>{row.v100}</td>
+                  <td style={{ padding: '12px', textAlign: 'center' }}>{row.v150}</td>
+                  <td style={{ padding: '12px', textAlign: 'center', fontWeight: 700, color: C.navy }}>{row.weight}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h3 style={{ fontSize: 20, fontWeight: 700, color: C.navy, marginBottom: 16, textAlign: 'center' }}>⚡ Gatekeepers Críticos</h3>
+      <p style={{ textAlign: 'center', color: C.gray, marginBottom: 20, fontSize: 13 }}>Si no se cumplen, el achievement de OG y COP1 será revisado a fin de año</p>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+        {GATEKEEPERS.map((gk, i) => (
+          <div key={i} className={`animate-fadeInUp stagger-${i+1}`} style={{
+            background: C.white, borderRadius: 12, padding: 20, textAlign: 'center',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: `1px solid ${C.skyBlue}`,
+            transition: 'transform 0.3s, box-shadow 0.3s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(21,101,192,0.12)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; }}
+          >
+            <div style={{ fontSize: 32, marginBottom: 8 }}>{gk.icon}</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: C.gray, marginBottom: 4 }}>{gk.title}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: C.navy, marginBottom: 4 }}>{gk.value}</div>
+            <div style={{ fontSize: 12, color: '#777' }}>{gk.detail}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ParticipantsTab() {
+  return (
+    <div className="animate-fadeIn" style={{ maxWidth: 1000, margin: '0 auto' }}>
+      <h2 style={{ fontSize: 28, fontWeight: 800, color: C.navy, textAlign: 'center', marginBottom: 8 }}>MANCOM Ecuador</h2>
+      <p style={{ textAlign: 'center', color: C.gray, marginBottom: 32, fontSize: 14 }}>Reportes directos de Josué De la Maza + Facilitadores</p>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
+        {PARTICIPANTS.map((p, i) => (
+          <div key={i} className={`animate-fadeInUp stagger-${Math.min(i+1, 8)}`} style={{
+            background: C.white, borderRadius: 12, padding: 20, position: 'relative', overflow: 'hidden',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderTop: `4px solid ${p.color}`,
+            transition: 'transform 0.3s, box-shadow 0.3s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,0,0,0.1)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; }}
+          >
+            {p.warning && (
+              <div style={{
+                position: 'absolute', top: 8, right: 8, background: C.red + '15', color: C.red,
+                padding: '3px 8px', borderRadius: 6, fontSize: 10, fontWeight: 700
+              }}>⚠️</div>
+            )}
+            {p.badge && (
+              <div style={{
+                position: 'absolute', top: 8, right: 8, background: C.gold + '25', color: C.amber,
+                padding: '3px 8px', borderRadius: 6, fontSize: 10, fontWeight: 700
+              }}>⭐ {p.badge}</div>
+            )}
+            <div style={{
+              width: 48, height: 48, borderRadius: '50%', background: `linear-gradient(135deg, ${p.color}, ${p.color}aa)`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: C.white, fontWeight: 700, fontSize: 16, marginBottom: 12
+            }}>
+              {p.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
+            </div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: C.navy, marginBottom: 4 }}>{p.name}</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: p.color, marginBottom: 4 }}>{p.role}</div>
+            <div style={{ fontSize: 12, color: C.gray }}>{p.area}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PlaybookTab() {
+  const [selected, setSelected] = useState(null);
+  const altoCount = INITIATIVES.filter(i => i.risk === 'ALTO').length;
+
+  return (
+    <div className="animate-fadeIn" style={{ maxWidth: 1100, margin: '0 auto' }}>
+      <h2 style={{ fontSize: 28, fontWeight: 800, color: C.navy, textAlign: 'center', marginBottom: 8 }}>Playbook de Continuidad</h2>
+      <p style={{ textAlign: 'center', color: C.gray, marginBottom: 20, fontSize: 14 }}>8 iniciativas críticas para H2 2026</p>
+
+      <div className="animate-fadeInUp stagger-1" style={{
+        background: `linear-gradient(135deg, ${C.red}12, ${C.red}05)`, borderRadius: 12,
+        padding: '16px 24px', marginBottom: 24, border: `1px solid ${C.red}30`,
+        display: 'flex', alignItems: 'center', gap: 12
+      }}>
+        <span style={{ fontSize: 24 }}>⚠️</span>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: C.red }}>{altoCount} de 8 iniciativas con riesgo ALTO de continuidad</div>
+          <div style={{ fontSize: 13, color: '#555' }}>Todas vinculadas a Tadeu Freitas. La asignación de custodios de respaldo es la decisión más urgente.</div>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 24, flexWrap: 'wrap' }}>
+        {[{ label: '🔴 Riesgo Alto', count: altoCount, color: C.red },
+          { label: '🟡 Riesgo Medio', count: INITIATIVES.filter(i => i.risk === 'MEDIO').length, color: C.amber },
+          { label: '🟢 Riesgo Bajo', count: INITIATIVES.filter(i => i.risk === 'BAJO').length, color: C.green },
+        ].map((r, i) => (
+          <div key={i} style={{ background: r.color + '12', borderRadius: 20, padding: '6px 16px', fontSize: 13, fontWeight: 600, color: r.color }}>
+            {r.label}: {r.count}
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+        {INITIATIVES.map((init, i) => {
+          const isSelected = selected === i;
+          return (
+            <div key={init.id} className={`animate-fadeInUp stagger-${Math.min(i+1, 8)}`}
+              onClick={() => setSelected(isSelected ? null : i)}
+              style={{
+                background: C.white, borderRadius: 12, overflow: 'hidden', cursor: 'pointer',
+                boxShadow: isSelected ? `0 8px 30px ${init.riskColor}20` : '0 2px 12px rgba(0,0,0,0.06)',
+                border: isSelected ? `2px solid ${init.riskColor}60` : '1px solid #e8e8e8',
+                transition: 'all 0.3s ease', position: 'relative',
+              }}
+              onMouseEnter={e => { if (!isSelected) e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)'; }}
+              onMouseLeave={e => { if (!isSelected) e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; }}
+            >
+              <div style={{ padding: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                  <div style={{ fontSize: 32 }}>{init.emoji}</div>
+                  <span style={{
+                    background: init.riskColor + '18', color: init.riskColor, padding: '3px 10px',
+                    borderRadius: 20, fontSize: 11, fontWeight: 700
+                  }}>
+                    {init.risk === 'ALTO' ? '🔴' : init.risk === 'MEDIO' ? '🟡' : '🟢'} {init.risk}
+                  </span>
+                </div>
+                <h3 style={{ fontSize: 15, fontWeight: 700, color: C.navy, marginBottom: 6, lineHeight: 1.3 }}>{init.title}</h3>
+                <div style={{ fontSize: 12, color: C.blue, fontWeight: 600, marginBottom: 8 }}>🎯 {init.target}</div>
+                <div style={{ fontSize: 12, color: C.gray }}>👤 {init.owner}</div>
+
+                {isSelected && (
+                  <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #eee' }}>
+                    <p style={{ fontSize: 13, color: '#555', lineHeight: 1.6 }}>{init.desc}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function PreWorkTab() {
+  return (
+    <div className="animate-fadeIn" style={{ maxWidth: 900, margin: '0 auto' }}>
+      <h2 style={{ fontSize: 28, fontWeight: 800, color: C.navy, textAlign: 'center', marginBottom: 8 }}>Pre-Work Obligatorio</h2>
+      <p style={{ textAlign: 'center', color: C.gray, marginBottom: 32, fontSize: 14 }}>Enviar completado 48 horas antes de la sesión</p>
+
+      <div className="animate-fadeInUp stagger-1" style={{
+        background: C.white, borderRadius: 12, padding: 28, boxShadow: '0 2px 16px rgba(0,0,0,0.06)', marginBottom: 24
+      }}>
+        <h3 style={{ fontSize: 18, fontWeight: 700, color: C.navy, marginBottom: 16 }}>📋 Tareas de preparación</h3>
+        {[
+          { icon: '📖', title: 'Leer los 4 mensajes de Josué', desc: 'Repasar los comunicados donde Josué expresa sus prioridades, preocupaciones y la visión para el equipo.' },
+          { icon: '📊', title: 'Leer la carta de Targets 2026', desc: 'Entender los nuevos objetivos revisados de la Zona, gatekeepers y lo que significan para el bono del mercado.' },
+          { icon: '📝', title: 'Completar el One-Pager de Diagnóstico Funcional', desc: 'Estado de tus prioridades vs. lo que pide Josué, lo que no está funcionando, y tu reflexión de continuidad. Máximo 1 página.' },
+          { icon: '💭', title: 'Reflexionar sobre la pregunta de continuidad', desc: '"Si yo me fuera mañana, ¿qué es lo que la persona que me reemplace más necesitaría saber para no perder el rumbo?"' },
+          { icon: '⚡', title: 'Traer una decisión postergada', desc: 'Nombra una decisión que como equipo hemos evitado tomar y que está frenando resultados.' },
+        ].map((task, i) => (
+          <div key={i} style={{
+            display: 'flex', gap: 16, alignItems: 'flex-start', padding: '14px 0',
+            borderBottom: i < 4 ? '1px solid #f0f0f0' : 'none'
+          }}>
+            <div style={{
+              width: 40, height: 40, borderRadius: 10, background: C.skyBlue, display: 'flex',
+              alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0
+            }}>{task.icon}</div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: C.navy, marginBottom: 4 }}>{task.title}</div>
+              <div style={{ fontSize: 13, color: '#555', lineHeight: 1.5 }}>{task.desc}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="animate-fadeInUp stagger-2" style={{
+        background: `linear-gradient(135deg, ${C.navy}, ${C.blue})`, borderRadius: 12,
+        padding: 28, color: C.white, marginBottom: 24
+      }}>
+        <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>⚖️ Reglas del Juego</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+          {[
+            { n: '01', t: 'Seguridad Psicológica', d: 'Lo que se dice aquí, se queda aquí' },
+            { n: '02', t: 'Problemas, no Personas', d: 'Hablar de problemas, no de personas' },
+            { n: '03', t: 'Opinión + Propuesta', d: 'Cada opinión viene con una propuesta' },
+            { n: '04', t: 'Decisiones > Discusiones', d: 'Se priorizan decisiones sobre discusiones' },
+          ].map((rule, i) => (
+            <div key={i} style={{
+              background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: 16,
+              border: '1px solid rgba(255,255,255,0.15)'
+            }}>
+              <div style={{ fontSize: 24, fontWeight: 800, color: C.gold, marginBottom: 4 }}>{rule.n}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{rule.t}</div>
+              <div style={{ fontSize: 12, opacity: 0.8 }}>{rule.d}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="animate-fadeInUp stagger-3" style={{
+        background: C.white, borderRadius: 12, padding: 28, boxShadow: '0 2px 16px rgba(0,0,0,0.06)'
+      }}>
+        <h3 style={{ fontSize: 18, fontWeight: 700, color: C.navy, marginBottom: 16 }}>📦 Entregables de la Sesión</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>
+          {[
+            { icon: '📘', title: 'Playbook de Continuidad', time: '48h post-sesión', desc: 'Fichas de las 8 iniciativas con dueños, custodios, hitos y riesgos' },
+            { icon: '📋', title: 'Acta de Decisiones', time: '24h post-sesión', desc: 'Todas las decisiones tomadas con responsables y fechas' },
+            { icon: '🗺️', title: 'Mapa de Riesgos', time: '48h post-sesión', desc: 'Matriz personas × iniciativas con plan de continuidad' },
+            { icon: '📊', title: 'Dashboard de Seguimiento', time: '1 semana post-sesión', desc: 'Power BI con las 8 iniciativas y tracking de hitos' },
+          ].map((d, i) => (
+            <div key={i} style={{
+              background: C.skyBlue + '40', borderRadius: 10, padding: 16, border: `1px solid ${C.skyBlue}`
+            }}>
+              <div style={{ fontSize: 24, marginBottom: 6 }}>{d.icon}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: C.navy, marginBottom: 2 }}>{d.title}</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: C.blue, marginBottom: 6 }}>⏰ {d.time}</div>
+              <div style={{ fontSize: 12, color: '#555' }}>{d.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ───────── MAIN APP ───────── */
+function App() {
+  const [activeTab, setActiveTab] = useState('overview');
+
+  const renderTab = () => {
+    switch (activeTab) {
+      case 'overview': return <OverviewTab />;
+      case 'agenda': return <AgendaTab />;
+      case 'diagnosis': return <DiagnosisTab />;
+      case 'targets': return <TargetsTab />;
+      case 'participants': return <ParticipantsTab />;
+      case 'playbook': return <PlaybookTab />;
+      case 'prework': return <PreWorkTab />;
+      default: return <OverviewTab />;
+    }
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', background: C.bg }}>
+      <Header />
+      <TabBar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <div style={{ padding: '32px 20px 60px' }} key={activeTab}>
+        {renderTab()}
+      </div>
+      <div style={{
+        textAlign: 'center', padding: '20px', color: C.gray, fontSize: 12,
+        borderTop: `1px solid ${C.skyBlue}`, background: C.white
+      }}>
+        Nestlé Ecuador · MANCOM 2026 · Confidencial — Uso interno únicamente
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+<script>
+function unlock() {
+  const PASSWORD = "ATERRIZAJE2026";
+  const input = document.getElementById("pass").value;
+
+  if (input === PASSWORD) {
+    document.getElementById("lock").style.display = "none";
+  } else {
+    alert("Contraseña incorrecta");
+  }
+}
+</script>
+
+</body>
+</html>

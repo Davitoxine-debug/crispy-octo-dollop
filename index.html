@@ -3,6 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+(function () {
+  const PASSWORD = "MANCOM2026";
+
+  let userPass = prompt("Ingrese la contraseña para acceder:");
+
+  if (userPass !== PASSWORD) {
+    document.body.innerHTML = "<h2 style='font-family: Arial; text-align:center; margin-top:50px;'>Acceso denegado</h2>";
+    document.body.style.background = "#f5f5f5";
+  }
+})();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d1b2a">
 <title>Pre-QOR:Aterrizaje Ecuador 2026 — Foco, Coraje y Continuidad</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -30,46 +48,78 @@
   .stagger-6 { animation-delay: 0.6s; opacity: 0; }
   .stagger-7 { animation-delay: 0.7s; opacity: 0; }
   .stagger-8 { animation-delay: 0.8s; opacity: 0; }
-</style>
 
-<style>
-#lock {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  font-family: Inter, sans-serif;
-  z-index: 9999;
-}
-#lock input, #lock button {
-  padding: 12px;
-  margin-top: 10px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-#lock button {
-  background: #1565c0;
-  color: white;
-  border: none;
-}
+
+  /* ── MOBILE / iPHONE OPTIMIZATIONS ── */
+  html { -webkit-text-size-adjust: 100%; }
+  body { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+  /* Safe areas */
+  .safe-top { padding-top: env(safe-area-inset-top, 0px) !important; }
+
+  /* Top tabs hidden on mobile; bottom nav shown */
+  .top-tab-bar { display: flex; }
+  .bottom-nav { display: none; }
+
+  /* Smooth momentum scrolling */
+  .scroll-x { -webkit-overflow-scrolling: touch; }
+
+  @media (max-width: 768px) {
+    .top-tab-bar { display: none !important; }
+    .bottom-nav {
+      display: flex !important;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 200;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid #e0e0e0;
+      padding: 4px 0 calc(4px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -2px 16px rgba(0,0,0,0.08);
+      height: calc(64px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .bottom-nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      font-size: 9px;
+      font-weight: 500;
+      color: #546e7a;
+      cursor: pointer;
+      transition: color 0.2s ease;
+      min-height: 44px;
+      border: none;
+      background: none;
+      font-family: 'Inter', sans-serif;
+      padding: 2px 0;
+    }
+
+    .bottom-nav-item.active { color: #1565c0; font-weight: 700; }
+    .bottom-nav-item .nav-icon { font-size: 20px; line-height: 1; }
+
+    /* Extra space so content is not hidden behind bottom nav */
+    .mobile-content-padding { padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)) !important; }
+    .mobile-footer-padding { padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)) !important; }
+
+    /* Improve tap targets inside cards */
+    button, [role="button"] { min-height: 44px; }
+  }
+
+  @media (max-width: 480px) {
+    /* Stack layouts on very small screens */
+    .mobile-grid-1col { grid-template-columns: 1fr !important; }
+    .mobile-flex-col { flex-direction: column !important; }
+  }
+
 </style>
 
 </head>
 <body>
-
-<div id="lock">
-  <h2>🔒 Acceso restringido</h2>
-  <input type="password" id="pass" placeholder="Contraseña">
-  <button onclick="unlock()">Entrar</button>
-</div>
-
 <div id="root"></div>
 <script type="text/babel">
 
@@ -98,17 +148,16 @@ const TABS = [
 /* ───────── DATA ───────── */
 const AGENDA_BLOCKS = [
   {
-    time: '08:00 — 08:50', duration: '50 min', title: 'Contexto y Verdad', icon: '🧭',
+    time: '08:30 — 09:10', duration: '40 min', title: 'Contexto y Verdad', icon: '🧭',
     color: C.blue, lightColor: C.skyBlue, block: 'BLOQUE 1',
     items: [
-      { t: '5 min', d: 'Check-in — Una palabra: ¿cómo llego hoy?' },
-      { t: '15 min', d: 'Apertura de Josué — Sin slides, desde el corazón' },
+      { t: '10 min', d: 'Check-in — Una palabra: ¿cómo llego hoy?' },
+      { t: '15 min', d: 'Apertura de Josué — Visión, preocupaciones' },
       { t: '15 min', d: 'Targets de Zona — Nuevos objetivos y gatekeepers' },
-      { t: '15 min', d: 'El elefante en la sala — Cambios organizacionales y continuidad' },
     ]
   },
   {
-    time: '08:50 — 10:20', duration: '90 min', title: 'Lo que nos Duele', icon: '🩺',
+    time: '09:10 — 10:40', duration: '1:30 min', title: 'Lo que nos Duele', icon: '🩺',
     color: C.green, lightColor: C.greenLight, block: 'BLOQUE 2',
     items: [
       { t: '30 min', d: 'Mesa 1: Market Share & Competitividad de Precios' },
@@ -117,39 +166,40 @@ const AGENDA_BLOCKS = [
     ]
   },
   {
-    time: '10:20 — 10:35', duration: '15 min', title: 'Break', icon: '☕',
+    time: '10:40 — 10:50', duration: '10 min', title: 'Break', icon: '☕',
     color: C.gray, lightColor: C.grayLight, block: 'PAUSA',
     items: [{ t: '', d: 'Café y recalibración entre facilitadores' }]
   },
   {
-    time: '10:35 — 12:00', duration: '85 min', title: 'Conversaciones con Coraje', icon: '🔥',
+    time: '10:50 — 13:00', duration: '85 min', title: 'Conversaciones con Coraje', icon: '🔥',
     color: C.red, lightColor: C.redLight, block: 'BLOQUE 3',
     items: [
+      { t: '40 min', d: 'Finalización de Compromisos Mesas de Trabajo' },
       { t: '25 min', d: 'Ronda de verdades incómodas — Lo que no nos estamos diciendo' },
       { t: '30 min', d: 'Mapa de riesgos de continuidad — Personas × Iniciativas' },
       { t: '30 min', d: 'Decisiones postergadas — ¿La tomamos hoy o agendamos?' },
     ]
   },
   {
-    time: '12:00 — 13:00', duration: '60 min', title: 'Almuerzo', icon: '🍽️',
+    time: '13:00', duration: '', title: 'Working Lunch', icon: '🍽️',
     color: C.gray, lightColor: C.grayLight, block: 'ALMUERZO',
-    items: [{ t: '', d: 'Espacio de descompresión y conversación libre' }]
+    items: [{ t: '', d: 'Almuerzo en sala para seguir trabajando' }]
   },
   {
-    time: '13:00 — 13:50', duration: '50 min', title: 'Plan de Aterrizaje / Playbook', icon: '📘',
+    time: '13:00 — 14:00', duration: '60 min', title: 'Plan de Aterrizaje / Playbook', icon: '📘',
     color: C.purple, lightColor: C.purpleLight, block: 'BLOQUE 4',
     items: [
-      { t: '10 min', d: 'Priorización de las 8 iniciativas críticas' },
+      { t: '20 min', d: 'Priorización de las 8 iniciativas críticas' },
       { t: '25 min', d: 'Construcción del Playbook en tríos de trabajo' },
       { t: '15 min', d: 'Asignación de dueños y custodios de respaldo' },
     ]
   },
   {
-    time: '13:50 — 14:05', duration: '15 min', title: 'Compromisos y Cierre', icon: '🤝',
+    time: '14:00 — 14:30', duration: '30 min', title: 'Compromisos y Cierre', icon: '🤝',
     color: C.gold, lightColor: '#fff8e1', block: 'BLOQUE 5',
     items: [
-      { t: '10 min', d: 'Ronda de compromiso: "Mi compromiso con este equipo…"' },
-      { t: '5 min', d: 'Cierre de Josué y firma simbólica del Playbook' },
+      { t: '15 min', d: 'Ronda de compromiso: "Mi compromiso con este equipo…"' },
+      { t: '15 min', d: 'Cierre de Josué y firma simbólica del Playbook' },
     ]
   },
 ];
@@ -197,7 +247,7 @@ const GATEKEEPERS = [
 
 const PARTICIPANTS = [
   { name: 'Josué De la Maza', role: 'Market Head', area: 'General Management', badge: null, warning: false, color: C.navy },
-  { name: 'Tadeu Freitas', role: 'Head of Sales', area: 'Sales', badge: null, warning: true, color: C.red },
+  { name: 'Tadeu Freitas', role: 'Head of Sales', area: 'Sales', badge: null, warning: false, color: C.red },
   { name: 'Andres Chamorro', role: 'BEO Café & CMB', area: 'General Management', badge: null, warning: false, color: C.blue },
   { name: 'Teodor Kamenov', role: 'BEO Confectionery', area: 'General Management', badge: null, warning: false, color: C.blue },
   { name: 'Jorge Penaherrera', role: 'BEO Culinary', area: 'General Management', badge: null, warning: false, color: C.blue },
@@ -209,6 +259,9 @@ const PARTICIPANTS = [
   { name: 'Juan Cevallos', role: 'Legal Director', area: 'Legal', badge: null, warning: false, color: C.gray },
   { name: 'Monica Jaramillo', role: 'Sr. CSV & Corporate Affairs', area: 'Compliance', badge: null, warning: false, color: C.gray },
   { name: 'Juan Velandia', role: 'Head of IT & Digital', area: 'IT & Digital', badge: 'Facilitador principal', warning: false, color: C.gold },
+  { name: 'Roberto Quintana', role: 'BEO CPW', area: 'Sales', badge: null, warning: false, color: C.red },
+  { name: 'Ana Valencia', role: 'BEO NIN', area: 'Sales', badge: null, warning: false, color: C.red },
+  { name: 'Maria Barniol', role: 'BEO Professional', area: 'Sales', badge: null, warning: false, color: C.red },
 ];
 
 const INITIATIVES = [
@@ -228,7 +281,7 @@ function Header() {
   return (
     <div style={{
       background: `linear-gradient(135deg, ${C.dark} 0%, ${C.navy} 40%, ${C.blue} 100%)`,
-      color: C.white, padding: '48px 24px 36px', textAlign: 'center', position: 'relative', overflow: 'hidden'
+      color: C.white, padding: 'calc(48px + env(safe-area-inset-top, 0px)) 24px 36px', textAlign: 'center', position: 'relative', overflow: 'hidden'
     }}>
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.05,
         backgroundImage: 'radial-gradient(circle at 20% 80%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)',
@@ -255,7 +308,7 @@ function Header() {
 
 function TabBar({ activeTab, setActiveTab }) {
   return (
-    <div style={{
+    <div className="top-tab-bar" style={{
       position: 'sticky', top: 0, zIndex: 100, background: C.white,
       borderBottom: `2px solid ${C.skyBlue}`,
       boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
@@ -325,7 +378,7 @@ function OverviewTab() {
       <div className="animate-fadeInUp stagger-5" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
         {[
           { icon: '📊', title: 'Targets retadores de la Zona', desc: 'OG al -1.8%, COP1 al 20.9%, costos estructurales -47 bps, y gatekeepers exigentes en Sell Out, Inventarios y Overdues.' },
-          { icon: '🔄', title: 'Cambios organizacionales', desc: 'Líderes clave podrían ser asignados a otros mercados. Necesitamos un plan que trascienda a las personas.' },
+          { icon: '🔄', title: 'Cambios organizacionales', desc: 'Líderes clave podrían moverse. Necesitamos un plan que trascienda a las personas.' },
           { icon: '📘', title: 'Playbook de continuidad', desc: 'El output será un plan ejecutable con dueños, custodios de respaldo, hitos y riesgos documentados.' },
         ].map((c, i) => (
           <div key={i} style={{
@@ -360,7 +413,7 @@ function AgendaTab() {
   return (
     <div className="animate-fadeIn" style={{ maxWidth: 800, margin: '0 auto' }}>
       <h2 style={{ fontSize: 28, fontWeight: 800, color: C.navy, textAlign: 'center', marginBottom: 8 }}>Agenda del Día</h2>
-      <p style={{ textAlign: 'center', color: C.gray, marginBottom: 32, fontSize: 14 }}>8:00 AM — 2:05 PM · 5 horas de sesión + 1 hora de almuerzo</p>
+      <p style={{ textAlign: 'center', color: C.gray, marginBottom: 32, fontSize: 14 }}>8:30 AM — 2:30 PM · 6 horas de sesión + working lunch</p>
 
       <div style={{ position: 'relative', paddingLeft: 40 }}>
         <div style={{ position: 'absolute', left: 18, top: 0, bottom: 0, width: 3, background: `linear-gradient(to bottom, ${C.blue}, ${C.purple}, ${C.gold})`, borderRadius: 2 }} />
@@ -742,6 +795,25 @@ function PreWorkTab() {
 }
 
 /* ───────── MAIN APP ───────── */
+
+
+function BottomNav({ activeTab, setActiveTab }) {
+  return (
+    <div className="bottom-nav">
+      {TABS.map(tab => (
+        <button
+          key={tab.id}
+          className={`bottom-nav-item ${activeTab === tab.id ? 'active' : ''}`}
+          onClick={() => setActiveTab(tab.id)}
+        >
+          <span className="nav-icon">{tab.icon}</span>
+          <span>{tab.label.split(' ')[0]}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function App() {
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -762,33 +834,23 @@ function App() {
     <div style={{ minHeight: '100vh', background: C.bg }}>
       <Header />
       <TabBar activeTab={activeTab} setActiveTab={setActiveTab} />
-      <div style={{ padding: '32px 20px 60px' }} key={activeTab}>
+      <div className="mobile-content-padding" style={{ padding: '32px 20px 60px' }} key={activeTab}>
         {renderTab()}
       </div>
-      <div style={{
+      <div className="mobile-footer-padding" style={{
         textAlign: 'center', padding: '20px', color: C.gray, fontSize: 12,
         borderTop: `1px solid ${C.skyBlue}`, background: C.white
       }}>
         Nestlé Ecuador · MANCOM 2026 · Confidencial — Uso interno únicamente
       </div>
+      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
-
 <script>
-function unlock() {
-  const PASSWORD = "ATERRIZAJE2026";
-  const input = document.getElementById("pass").value;
-
-  if (input === PASSWORD) {
-    document.getElementById("lock").style.display = "none";
-  } else {
-    alert("Contraseña incorrecta");
-  }
-}
 </script>
 
 </body>

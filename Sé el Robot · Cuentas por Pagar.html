@@ -1,0 +1,454 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Sé el Robot · Cuentas por Pagar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap">
+<style>
+/* Layout: back-office workstation — inbox | document | ERP form, with a round bar on top and a scoreboard below */
+:root{
+  --bg:#eef2f6; --panel:#ffffff; --panel2:#f5f8fb; --line:#d5dde7; --ink:#1b2333; --mute:#5d6b82;
+  --navy:#21295C; --teal:#065A82; --teal2:#1C7293; --amber:#c27a12; --amber-bg:#fdf3e3;
+  --ok:#1f7a4d; --ok-bg:#e5f4ec; --bad:#b4372f; --bad-bg:#fbe9e7; --hl:#fff6c9;
+  --paper:#fffdf8; --paper-ink:#2a2a2a;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1528; --panel:#171f38; --panel2:#1d2745; --line:#2d3a62; --ink:#e8edf7; --mute:#9aa8c6;
+  --navy:#9fb4ff; --teal:#4fb3e0; --teal2:#3a9cc6; --amber:#f0b44c; --amber-bg:#3a2e17;
+  --ok:#4ecb8d; --ok-bg:#163527; --bad:#ff7a6e; --bad-bg:#3d1d1c; --hl:#4a4320;
+  --paper:#f4f1e8; --paper-ink:#262626; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1528; --panel:#171f38; --panel2:#1d2745; --line:#2d3a62; --ink:#e8edf7; --mute:#9aa8c6;
+  --navy:#9fb4ff; --teal:#4fb3e0; --teal2:#3a9cc6; --amber:#f0b44c; --amber-bg:#3a2e17;
+  --ok:#4ecb8d; --ok-bg:#163527; --bad:#ff7a6e; --bad-bg:#3d1d1c; --hl:#4a4320;
+  --paper:#f4f1e8; --paper-ink:#262626; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.45;margin:0}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:16px 40px;display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
+button{font-family:var(--body);cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.tabnum{font-variant-numeric:tabular-nums}
+
+/* top */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 24px}
+.brand{display:flex;flex-direction:column;gap:2px;min-width:0}
+.brand .eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.brand h1{font-size:30px;color:var(--navy);line-height:1.05}
+.brand p{margin:0;color:var(--mute);max-width:62ch}
+.rounds{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.round{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:8px 12px;text-align:left;display:flex;flex-direction:column;gap:1px;min-width:132px}
+.round b{font-family:var(--display);font-size:15px}
+.round span{font-size:11.5px;color:var(--mute)}
+.round[aria-pressed="true"]{border-color:var(--teal);box-shadow:inset 0 -3px 0 var(--teal);background:var(--panel2)}
+.round .st{font-size:11px;font-weight:600;color:var(--ok)}
+
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.bar .msg{flex:1 1 300px;min-width:0;color:var(--ink)}
+.bar .msg b{color:var(--navy)}
+.clock{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--navy);min-width:88px;text-align:right}
+.clock.warn{color:var(--bad)}
+.btn{border:0;border-radius:8px;padding:10px 16px;font-weight:600;font-size:14px;background:var(--teal);color:#fff}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--teal);border:1px solid var(--teal)}
+.btn.amber{background:var(--amber);color:#1b1404}
+.btn[disabled]{opacity:.45;cursor:not-allowed;filter:none}
+select.sm{font-family:var(--body);font-size:13px;padding:7px 8px;border-radius:7px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+
+/* workstation */
+.ws{display:grid;grid-template-columns:250px minmax(0,1fr) 360px;gap:12px;align-items:start}
+@media (max-width:1100px){.ws{grid-template-columns:220px minmax(0,1fr)}.erp{grid-column:1 / -1}}
+@media (max-width:720px){.ws{grid-template-columns:1fr}}
+.pane{background:var(--panel);border:1px solid var(--line);border-radius:10px;min-width:0;overflow:hidden}
+.pane-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);background:var(--panel2)}
+.pane-h h2{font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.pane-h .count{font-family:var(--mono);font-size:12px;color:var(--mute)}
+
+.inbox{list-style:none;margin:0;padding:0;max-height:560px;overflow:auto}
+.mail{display:grid;grid-template-columns:8px minmax(0,1fr);gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.mail:hover{background:var(--panel2)}
+.mail[aria-current="true"]{background:var(--hl)}
+.mail .dot{width:8px;height:8px;border-radius:50%;background:var(--teal);margin-top:6px}
+.mail.done .dot{background:var(--ok)} .mail.exc .dot{background:var(--amber)} .mail.err .dot{background:var(--bad)}
+.mail .from{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mail .subj{font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mail .tag{font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-top:2px}
+.mail.done .tag{color:var(--ok)} .mail.exc .tag{color:var(--amber)} .mail.err .tag{color:var(--bad)}
+
+/* document */
+.docwrap{padding:14px;background:var(--panel2);min-height:420px;display:flex;justify-content:center;align-items:flex-start;overflow:auto}
+.ride{background:var(--paper);color:var(--paper-ink);width:100%;max-width:560px;border:1px solid #cfc8b8;border-radius:3px;padding:16px 18px;font-size:12.5px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.ride .rh{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;border-bottom:1.5px solid #333;padding-bottom:8px;margin-bottom:8px}
+.ride .rh .co{font-weight:700;font-size:14px}
+.ride .rh .box{border:1px solid #555;padding:6px 8px;font-size:11.5px}
+.ride .rh .box b{display:block;font-size:13px;letter-spacing:.04em}
+.ride .k{color:#6a6458;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em}
+.ride .mono{font-family:var(--mono)}
+.ride table{width:100%;border-collapse:collapse;margin-top:8px}
+.ride td,.ride th{border:1px solid #bbb3a1;padding:4px 6px;text-align:left}
+.ride th{background:#efe9dc;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em}
+.ride .tot td{font-family:var(--mono)}
+.ride .clave{font-family:var(--mono);font-size:10px;word-break:break-all;color:#555}
+.ride.scan{filter:blur(.45px) contrast(.92) sepia(.25);transform:rotate(-1.3deg);background:#f3eedf}
+.ride.scan .stamp{position:relative}
+.scanlabel{font-family:var(--mono);font-size:11px;color:var(--amber);margin-bottom:6px}
+.mailbody{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:14px 16px;max-width:560px;width:100%;font-size:13.5px}
+.mailbody .hdr{font-size:12px;color:var(--mute);border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px}
+.mailbody p{margin:0 0 8px}
+
+/* ERP */
+.erp form{padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:9px 10px}
+.erp label{display:flex;flex-direction:column;gap:3px;font-size:11.5px;font-weight:600;color:var(--mute);text-transform:uppercase;letter-spacing:.05em}
+.erp label.full{grid-column:1 / -1}
+.erp input,.erp select{font-family:var(--mono);font-size:14px;padding:7px 8px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);width:100%;min-width:0}
+.erp input.typing{background:var(--hl)}
+.erp input.bad,.erp select.bad{border-color:var(--bad);background:var(--bad-bg)}
+.erp .actions{grid-column:1 / -1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.erp .feedback{grid-column:1 / -1;font-size:13px;min-height:20px}
+.erp .feedback.ok{color:var(--ok)} .erp .feedback.bad{color:var(--bad)}
+.ocs{border-top:1px solid var(--line)}
+.ocs table{width:100%;border-collapse:collapse;font-size:12px}
+.ocs th{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);text-align:left;padding:6px 10px;background:var(--panel2)}
+.ocs td{padding:5px 10px;border-top:1px solid var(--line);font-family:var(--mono)}
+.ocs td.r,.ocs th.r{text-align:right}
+.ocs .rule{padding:8px 12px;font-size:12px;background:var(--amber-bg);color:var(--ink)}
+.ocscroll{max-height:220px;overflow:auto}
+
+/* results */
+.results{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:12px}
+@media (max-width:900px){.results{grid-template-columns:1fr}}
+.tbl{overflow-x:auto}
+.tbl table{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--mute);text-align:right;padding:8px 12px;border-bottom:1px solid var(--line)}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+.tbl td:first-child b{font-family:var(--display);font-size:15px}
+.tbl .pending{color:var(--mute);font-style:italic}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px}
+.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.exc{background:var(--amber-bg);color:var(--amber)}
+.proj{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.proj .inputs{display:flex;flex-wrap:wrap;gap:10px}
+.proj label{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--mute);font-weight:600;text-transform:uppercase;letter-spacing:.05em;flex:1 1 140px}
+.proj input{font-family:var(--mono);font-size:15px;padding:7px 9px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);color:var(--ink)}
+.bars{display:flex;flex-direction:column;gap:8px}
+.brow{display:grid;grid-template-columns:96px minmax(0,1fr) 120px;gap:10px;align-items:center;font-size:13px}
+.brow .track{height:18px;background:var(--panel2);border-radius:4px;overflow:hidden;border:1px solid var(--line)}
+.brow .fill{height:100%;background:var(--teal);transition:width .4s ease}
+.brow.h .fill{background:var(--mute)} .brow.ia .fill{background:var(--amber)}
+.brow .v{font-family:var(--mono);text-align:right}
+.note{font-size:12px;color:var(--mute)}
+.share{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.share textarea{flex:1 1 260px;min-width:0;font-family:var(--mono);font-size:12px;height:58px;border:1px solid var(--line);border-radius:6px;background:var(--panel2);color:var(--ink);padding:6px 8px;resize:vertical}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <span class="eyebrow">Sesión 5 · RPA · Cuentas por pagar</span>
+      <h1>Sé el Robot</h1>
+      <p>Registra las facturas de proveedores en el ERP. Primero tú, contra reloj. Después el robot. Después el robot con IA. Compara.</p>
+    </div>
+    <div class="rounds" role="group" aria-label="Rondas">
+      <button class="round" id="r1btn" aria-pressed="true"><b>Ronda 1 · Humano</b><span>Tú registras a mano</span><span class="st" id="r1st"></span></button>
+      <button class="round" id="r2btn" aria-pressed="false"><b>Ronda 2 · Robot RPA</b><span>Reglas fijas, datos estructurados</span><span class="st" id="r2st"></span></button>
+      <button class="round" id="r3btn" aria-pressed="false"><b>Ronda 3 · Robot + IA</b><span>Lee documentos no estructurados</span><span class="st" id="r3st"></span></button>
+    </div>
+  </div>
+
+  <div class="bar">
+    <div class="msg" id="msg"></div>
+    <select class="sm" id="dur" aria-label="Duración de la ronda humana"><option value="180">3 min</option><option value="240" selected>4 min</option><option value="300">5 min</option></select>
+    <button class="btn" id="go">Empezar ronda</button>
+    <div class="clock" id="clock" aria-live="polite">04:00</div>
+  </div>
+
+  <div class="ws">
+    <section class="pane" aria-label="Bandeja de entrada">
+      <div class="pane-h"><h2>Bandeja</h2><span class="count" id="inboxCount">12</span></div>
+      <ul class="inbox" id="inbox"></ul>
+    </section>
+
+    <section class="pane" aria-label="Documento">
+      <div class="pane-h"><h2 id="docTitle">Documento</h2><span class="count" id="docKind"></span></div>
+      <div class="docwrap" id="doc"></div>
+    </section>
+
+    <section class="pane erp" aria-label="ERP">
+      <div class="pane-h"><h2>ERP · Registro de factura</h2><span class="count">Módulo CxP</span></div>
+      <form id="form" autocomplete="off">
+        <label class="full">RUC del proveedor<input id="f_ruc" inputmode="numeric" maxlength="13" placeholder="13 dígitos"></label>
+        <label class="full">N.º de factura<input id="f_num" placeholder="001-001-000000000"></label>
+        <label>Fecha de emisión<input id="f_fecha" placeholder="dd/mm/aaaa"></label>
+        <label>Orden de compra<input id="f_oc" inputmode="numeric" placeholder="45000…"></label>
+        <label>Subtotal (USD)<input id="f_sub" inputmode="decimal"></label>
+        <label>IVA 15 % (USD)<input id="f_iva" inputmode="decimal"></label>
+        <label>Total (USD)<input id="f_tot" inputmode="decimal"></label>
+        <label>Acción<select id="f_acc"><option value="">Elegir…</option><option value="REG">Registrar</option><option value="REV">A revisión</option></select></label>
+        <div class="actions"><button type="submit" class="btn" id="save">Guardar en ERP</button><button type="button" class="btn ghost" id="clear">Limpiar</button></div>
+        <div class="feedback" id="fb" aria-live="polite"></div>
+      </form>
+      <div class="ocs">
+        <div class="rule"><b>Regla de negocio:</b> si la OC no existe o el total difiere más de 2 % del monto de la OC → <b>Enviar a revisión</b>. Si no → <b>Registrar</b>.</div>
+        <div class="ocscroll"><table><thead><tr><th>OC abierta</th><th>Proveedor</th><th class="r">Monto</th></tr></thead><tbody id="ocBody"></tbody></table></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="results">
+    <section class="pane" aria-label="Marcador">
+      <div class="pane-h"><h2>Marcador</h2><span class="count">12 facturas por ronda</span></div>
+      <div class="tbl"><table>
+        <thead><tr><th>Ronda</th><th>Procesadas</th><th>Sin error</th><th>Errores</th><th>A persona</th><th>Tiempo</th><th>Seg./factura</th></tr></thead>
+        <tbody id="score"></tbody>
+      </table></div>
+      <div class="proj" style="padding-top:4px">
+        <div class="share"><textarea id="shareTxt" readonly aria-label="Resultado para compartir"></textarea><button class="btn ghost" id="copy">Copiar para el chat</button></div>
+      </div>
+    </section>
+
+    <section class="pane" aria-label="Proyección mensual">
+      <div class="pane-h"><h2>¿Y en un mes?</h2><span class="count">Horas de analista</span></div>
+      <div class="proj">
+        <div class="inputs">
+          <label>Facturas al mes<input id="p_n" type="number" min="100" step="100" value="1500"></label>
+          <label>Costo hora analista (USD)<input id="p_c" type="number" min="1" step="0.5" value="7"></label>
+          <label>Seg. manuales/factura<input id="p_t" type="number" min="10" step="5" value="150"></label>
+        </div>
+        <div class="bars" id="bars"></div>
+        <p class="note" id="projNote"></p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  // ---------- Datos (simulados con fines académicos) ----------
+  var OCS=[
+    ["4500012866","Cartonera Nacional S.A.",6440.00],["4500012868","Plásticos Guayas S.A.",3415.00],
+    ["4500012870","Mantenimiento Industrial MISA",1288.00],["4500012871","Distribuidora Pichincha Cía. Ltda.",1426.00],
+    ["4500012873","Químicos del Pacífico S.A.",2794.50],["4500012875","Transportes del Litoral S.A.",989.00],
+    ["4500012877","Lácteos de la Sierra Cía. Ltda.",2277.00],["4500012879","Seguridad Integral SEGIN",1127.00],
+    ["4500012880","Servicios de Limpieza Austral",483.00],["4500012883","Ferretería El Constructor",316.71],
+    ["4500012885","Tecnología Ágil TECAG",862.50]
+  ];
+  var INV=[
+    {k:"xml",prov:"Distribuidora Pichincha Cía. Ltda.",ruc:"1791234567001",num:"001-002-000004521",fecha:"03/09/2026",oc:"4500012871",sub:1240.00,dir:"Av. Galo Plaza Lasso N45-12, Quito"},
+    {k:"xml",prov:"Transportes del Litoral S.A.",ruc:"0992345678001",num:"002-001-000018734",fecha:"04/09/2026",oc:"4500012875",sub:860.00,dir:"Km 6,5 vía a Daule, Guayaquil"},
+    {k:"email",prov:"Servicios de Limpieza Austral",ruc:"0190345678001",num:"001-001-000000932",fecha:"05/09/2026",oc:"4500012880",sub:420.00,contact:"Rosa Quizhpe"},
+    {k:"xml",prov:"Plásticos Guayas S.A.",ruc:"0991122334001",num:"001-003-000056210",fecha:"05/09/2026",oc:"4500012868",sub:3150.00,dir:"Parque Industrial Inmaconsa, Guayaquil"},
+    {k:"scan",prov:"Ferretería El Constructor",ruc:"1790987654001",num:"003-001-000002277",fecha:"08/09/2026",oc:"4500012883",sub:275.40,dir:"Av. Maldonado S12-80, Quito",conf:93},
+    {k:"xml",prov:"Cartonera Nacional S.A.",ruc:"0990011223001",num:"001-001-000098451",fecha:"08/09/2026",oc:"4500012866",sub:5600.00,dir:"Av. Juan Tanca Marengo, Guayaquil"},
+    {k:"xml",prov:"Lácteos de la Sierra Cía. Ltda.",ruc:"1791357913001",num:"001-004-000011208",fecha:"09/09/2026",oc:"4500012877",sub:1980.00,dir:"Panamericana Norte Km 12, Cayambe"},
+    {k:"email",prov:"Tecnología Ágil TECAG",ruc:"1792468024001",num:"001-001-000000415",fecha:"10/09/2026",oc:"4500012885",sub:750.00,contact:"Andrés Paredes"},
+    {k:"xml",prov:"Etiquetas Express S.A.",ruc:"0992468135001",num:"002-002-000007730",fecha:"10/09/2026",oc:"4500012899",sub:640.00,dir:"Cdla. Kennedy Norte, Guayaquil"},
+    {k:"scan",prov:"Mantenimiento Industrial MISA",ruc:"0991597531001",num:"001-001-000003349",fecha:"11/09/2026",oc:"4500012870",sub:1120.00,dir:"Vía Perimetral Km 24, Guayaquil",conf:64},
+    {k:"xml",prov:"Químicos del Pacífico S.A.",ruc:"0993579135001",num:"001-002-000021987",fecha:"12/09/2026",oc:"4500012873",sub:2430.00,dir:"Av. de las Américas, Guayaquil"},
+    {k:"xml",prov:"Seguridad Integral SEGIN",ruc:"1790246813001",num:"001-001-000014562",fecha:"12/09/2026",oc:"4500012879",sub:980.00,dir:"Av. 6 de Diciembre N34-120, Quito"}
+  ];
+  INV.forEach(function(v,i){
+    v.id=i; v.iva=Math.round(v.sub*15)/100; v.tot=Math.round((v.sub+v.iva)*100)/100;
+    var oc=OCS.filter(function(o){return o[0]===v.oc;})[0];
+    v.acc=(!oc||Math.abs(v.tot-oc[2])/oc[2]>0.02)?"REV":"REG";
+    if(v.k==="email") v.conf=v.id===2?95:91;
+    var s=""; for(var j=0;j<49;j++) s+=((v.ruc.charCodeAt(j%13)+j*7+i*3)%10);
+    v.clave=s;
+  });
+  var money=function(n){return n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});};
+
+  // ---------- Estado ----------
+  var round=1, running=false, t0=0, limit=240, tick=null, current=0;
+  var R={1:null,2:null,3:null};       // resultados por ronda
+  var status={};                      // id -> {state:'done'|'exc'|'err', tag}
+  var botBusy=false;
+
+  // ---------- Vista: OC ----------
+  $("ocBody").innerHTML=OCS.map(function(o){return "<tr><td>"+o[0]+"</td><td style='font-family:var(--body)'>"+o[1]+"</td><td class='r'>"+money(o[2])+"</td></tr>";}).join("");
+
+  // ---------- Vista: bandeja ----------
+  function renderInbox(){
+    $("inbox").innerHTML=INV.map(function(v){
+      var st=status[v.id], cls="mail"+(st?" "+st.state:""), subj=v.k==="email"?"Re: factura de "+monthName(v.fecha):(v.k==="scan"?"Factura escaneada adjunta":"Factura electrónica "+v.num);
+      return '<li class="'+cls+'" data-id="'+v.id+'" aria-current="'+(v.id===current)+'" tabindex="0"><span class="dot"></span><div style="min-width:0"><div class="from">'+v.prov+'</div><div class="subj">'+subj+'</div>'+(st?'<div class="tag">'+st.tag+'</div>':'')+'</div></li>';
+    }).join("");
+    var pend=INV.filter(function(v){return !status[v.id];}).length;
+    $("inboxCount").textContent=pend+" pendientes";
+  }
+  function monthName(f){return ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"][parseInt(f.split("/")[1],10)-1];}
+  $("inbox").addEventListener("click",function(e){var li=e.target.closest(".mail"); if(li&&!botBusy) select(+li.dataset.id);});
+  $("inbox").addEventListener("keydown",function(e){if(e.key==="Enter"){var li=e.target.closest(".mail"); if(li&&!botBusy) select(+li.dataset.id);}});
+
+  // ---------- Vista: documento ----------
+  function renderDoc(v){
+    $("docTitle").textContent=v.prov;
+    $("docKind").textContent=v.k==="xml"?"RIDE · factura electrónica":(v.k==="scan"?"PDF escaneado":"Correo sin adjunto estructurado");
+    if(v.k==="email"){
+      $("doc").innerHTML='<div class="mailbody"><div class="hdr">De: '+v.contact+' &lt;cobranzas@'+v.prov.split(" ").slice(-1)[0].toLowerCase()+'.ec&gt;<br>Asunto: Re: factura de '+monthName(v.fecha)+'</div>'+
+        '<p>Buenas tardes estimados,</p><p>Les escribo para recordarles el pago de nuestra factura <b>'+v.num.replace(/^(\d{3})-(\d{3})-0*/,"$1-$2-")+'</b> (n.º completo '+v.num+') emitida el '+v.fecha.replace(/\//g," / ")+', correspondiente a la orden de compra '+v.oc+'.</p>'+
+        '<p>El valor es de '+money(v.sub)+' más IVA ('+money(v.iva)+'), es decir <b>USD '+money(v.tot)+'</b> en total. Nuestro RUC es '+v.ruc+'.</p><p>Quedo atenta a la confirmación del registro.<br>Saludos cordiales,<br>'+v.contact+'<br>'+v.prov+'</p></div>';
+      return;
+    }
+    var scan=v.k==="scan";
+    $("doc").innerHTML=(scan?'<div><div class="scanlabel">FACTURA FÍSICA · ESCANEADA 200 dpi</div>':'<div style="width:100%;max-width:560px">')+
+      '<div class="ride'+(scan?" scan":"")+'"><div class="rh"><div><div class="co">'+v.prov+'</div><div>'+v.dir+'</div><div class="k" style="margin-top:6px">Obligado a llevar contabilidad: SÍ</div></div>'+
+      '<div class="box"><span class="k">R.U.C.</span><b class="mono">'+v.ruc+'</b><b>FACTURA</b><span class="mono">N.º '+v.num+'</span>'+(scan?'<div class="k" style="margin-top:4px">Aut. SRI preimpresa</div>':'<div class="k" style="margin-top:4px">Clave de acceso</div><div class="clave">'+v.clave+'</div>')+'</div></div>'+
+      '<div style="display:flex;gap:18px;flex-wrap:wrap"><div><span class="k">Cliente</span><br>Comercial Andina S.A.</div><div><span class="k">Fecha de emisión</span><br><span class="mono">'+v.fecha+'</span></div><div><span class="k">Orden de compra</span><br><span class="mono">'+v.oc+'</span></div></div>'+
+      '<table><thead><tr><th>Descripción</th><th style="text-align:right">Valor</th></tr></thead><tbody><tr><td>Bienes y servicios según OC '+v.oc+'</td><td class="mono" style="text-align:right">'+money(v.sub)+'</td></tr></tbody></table>'+
+      '<table class="tot" style="width:60%;margin-left:auto"><tr><td>SUBTOTAL 15 %</td><td style="text-align:right">'+money(v.sub)+'</td></tr><tr><td>IVA 15 %</td><td style="text-align:right">'+money(v.iva)+'</td></tr><tr><td><b>VALOR TOTAL</b></td><td style="text-align:right"><b>'+money(v.tot)+'</b></td></tr></table></div></div>';
+  }
+
+  function select(id,keepFb){ current=id; renderDoc(INV[id]); renderInbox(); var fb=$("fb").textContent, fc=$("fb").className; clearForm(); if(keepFb){$("fb").textContent=fb; $("fb").className=fc;} }
+
+  // ---------- Formulario ----------
+  var F=["ruc","num","fecha","oc","sub","iva","tot","acc"];
+  function clearForm(){ F.forEach(function(f){var el=$("f_"+f); el.value=""; el.classList.remove("bad","typing");}); $("fb").textContent=""; $("fb").className="feedback"; }
+  $("clear").onclick=clearForm;
+  function num(s){ s=String(s).trim().replace(/\s/g,""); if(/,\d{1,2}$/.test(s)) s=s.replace(/\./g,"").replace(",","."); else s=s.replace(/,/g,""); return parseFloat(s); }
+  function check(v){
+    var bad=[];
+    if($("f_ruc").value.replace(/\D/g,"")!==v.ruc) bad.push("ruc");
+    if($("f_num").value.replace(/\s/g,"")!==v.num) bad.push("num");
+    var fd=$("f_fecha").value.replace(/\s/g,"").replace(/-/g,"/").split("/"); if(fd.length!==3||(+fd[0])+"/"+(+fd[1])+"/"+(+fd[2])!==v.fecha.split("/").map(Number).join("/")) bad.push("fecha");
+    if($("f_oc").value.replace(/\D/g,"")!==v.oc) bad.push("oc");
+    if(Math.abs(num($("f_sub").value)-v.sub)>0.005||isNaN(num($("f_sub").value))) bad.push("sub");
+    if(Math.abs(num($("f_iva").value)-v.iva)>0.005||isNaN(num($("f_iva").value))) bad.push("iva");
+    if(Math.abs(num($("f_tot").value)-v.tot)>0.005||isNaN(num($("f_tot").value))) bad.push("tot");
+    if($("f_acc").value!==v.acc) bad.push("acc");
+    return bad;
+  }
+  var NAMES={ruc:"RUC",num:"n.º de factura",fecha:"fecha",oc:"OC",sub:"subtotal",iva:"IVA",tot:"total",acc:"acción"};
+  $("form").addEventListener("submit",function(e){
+    e.preventDefault();
+    if(round!==1||!running){ $("fb").className="feedback bad"; $("fb").textContent=round===1?"Pulsa “Empezar ronda” para iniciar el reloj.":"En esta ronda trabaja el robot."; return; }
+    var v=INV[current]; if(status[v.id]){ $("fb").className="feedback bad"; $("fb").textContent="Esta factura ya fue registrada. Elige otra de la bandeja."; return; }
+    var bad=check(v); F.forEach(function(f){$("f_"+f).classList.toggle("bad",bad.indexOf(f)>=0);});
+    R[1].done++;
+    if(bad.length){ R[1].err++; status[v.id]={state:"err",tag:"Registrada con error"}; $("fb").className="feedback bad"; $("fb").textContent="Guardada con error en: "+bad.map(function(b){return NAMES[b];}).join(", ")+". En la vida real, alguien lo descubrirá en la conciliación."; }
+    else { R[1].ok++; status[v.id]={state:"done",tag:v.acc==="REG"?"Registrada":"En revisión"}; $("fb").className="feedback ok"; $("fb").textContent="Correcta. Siguiente factura."; }
+    renderInbox(); renderScore();
+    var next=INV.filter(function(x){return !status[x.id];})[0];
+    if(!next){ endHuman(); return; }
+    setTimeout(function(){ if(round===1&&running) select(next.id,true); },700);
+  });
+
+  // ---------- Rondas ----------
+  function setRound(n){
+    if(running||botBusy) return;
+    round=n; ["r1btn","r2btn","r3btn"].forEach(function(id,i){$(id).setAttribute("aria-pressed",String(i+1===n));});
+    status={}; select(0); renderInbox();
+    $("dur").hidden = n!==1;
+    $("go").textContent = n===1?"Empezar ronda":(n===2?"Ejecutar robot":"Ejecutar robot + IA");
+    $("go").className = "btn"+(n===3?" amber":"");
+    $("clock").textContent = n===1?fmt(+$("dur").value):"00:00"; $("clock").classList.remove("warn");
+    setMsg();
+  }
+  function setMsg(){
+    var m={1:"<b>Ronda 1.</b> Elige una factura, copia sus datos al ERP, revisa la OC y decide la acción. Cuenta cada segundo y cada error.",
+           2:"<b>Ronda 2.</b> El robot sigue reglas fijas: lee campos estructurados (factura electrónica), consulta la OC y registra. Lo que no entiende lo manda a una persona.",
+           3:"<b>Ronda 3.</b> Al robot se le suma IA de documentos (IDP): lee PDF escaneados y correos. Si la confianza baja de 80 %, una persona valida (human-in-the-loop)."};
+    $("msg").innerHTML=m[round];
+  }
+  $("r1btn").onclick=function(){setRound(1);}; $("r2btn").onclick=function(){setRound(2);}; $("r3btn").onclick=function(){setRound(3);};
+  $("dur").onchange=function(){ if(!running) $("clock").textContent=fmt(+this.value); };
+  function fmt(s){s=Math.max(0,Math.round(s)); return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");}
+
+  $("go").onclick=function(){
+    if(round===1){ if(running){ endHuman(); return; } startHuman(); }
+    else if(!botBusy) runBot(round===3);
+  };
+  function startHuman(){
+    status={}; R[1]={done:0,ok:0,err:0,exc:0,secs:0}; running=true; limit=+$("dur").value; t0=Date.now();
+    $("go").textContent="Terminar ronda"; $("go").className="btn ghost"; select(0); renderScore();
+    tick=setInterval(function(){ var left=limit-(Date.now()-t0)/1000; $("clock").textContent=fmt(left); $("clock").classList.toggle("warn",left<30); if(left<=0) endHuman(); },250);
+  }
+  function endHuman(){
+    if(!running) return; running=false; clearInterval(tick);
+    R[1].secs=Math.min(limit,(Date.now()-t0)/1000);
+    $("go").textContent="Repetir ronda"; $("go").className="btn";
+    $("r1st").textContent="✓ "+R[1].ok+(R[1].ok===1?" correcta":" correctas");
+    $("msg").innerHTML="<b>Ronda 1 terminada.</b> Procesaste "+R[1].done+" de 12 facturas, "+R[1].err+" con error. Ahora pasa a la Ronda 2 y deja trabajar al robot.";
+    if(R[1].done>0) $("p_t").value=Math.max(20,Math.round(R[1].secs/R[1].done));
+    renderScore(); renderProj();
+  }
+
+  // ---------- Robot ----------
+  function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+  async function typeInto(el,text,cps){
+    el.classList.add("typing"); el.value="";
+    for(var i=0;i<text.length;i++){ el.value+=text[i]; await sleep(1000/cps); }
+    el.classList.remove("typing");
+  }
+  async function runBot(withAI){
+    botBusy=true; status={}; var k=withAI?3:2; R[k]={done:0,ok:0,err:0,exc:0,secs:0}; renderInbox(); renderScore();
+    var start=Date.now(); $("go").disabled=true;
+    var clk=setInterval(function(){$("clock").textContent=fmt((Date.now()-start)/1000);},200);
+    for(var i=0;i<INV.length;i++){
+      var v=INV[i]; select(i); await sleep(260);
+      var structured=v.k==="xml";
+      if(!structured && !withAI){
+        $("fb").className="feedback bad"; $("fb").textContent="Excepción: el documento no tiene campos estructurados ("+(v.k==="scan"?"imagen escaneada":"texto libre")+"). Enviado a la cola humana.";
+        status[v.id]={state:"exc",tag:"Excepción → persona"}; R[k].exc++; renderInbox(); renderScore(); await sleep(650); continue;
+      }
+      if(!structured && withAI && v.conf<80){
+        $("fb").className="feedback bad"; $("fb").textContent="IA de documentos: confianza "+v.conf+" % (< 80 %). Una persona valida los campos (human-in-the-loop).";
+        status[v.id]={state:"exc",tag:"IA "+v.conf+" % → validación humana"}; R[k].exc++; renderInbox(); renderScore(); await sleep(800); continue;
+      }
+      var cps=withAI&&!structured?55:80;
+      if(withAI&&!structured){ $("fb").className="feedback ok"; $("fb").textContent="IA de documentos extrajo los campos con "+v.conf+" % de confianza."; }
+      await typeInto($("f_ruc"),v.ruc,cps*2); await typeInto($("f_num"),v.num,cps*2); await typeInto($("f_fecha"),v.fecha,cps*2);
+      await typeInto($("f_oc"),v.oc,cps*2); await typeInto($("f_sub"),v.sub.toFixed(2),cps); await typeInto($("f_iva"),v.iva.toFixed(2),cps); await typeInto($("f_tot"),v.tot.toFixed(2),cps);
+      $("f_acc").value=v.acc;
+      R[k].done++; R[k].ok++;
+      status[v.id]={state:"done",tag:(v.acc==="REG"?"Registrada":"OC no cuadra → revisión")+(withAI&&!structured?" · IA "+v.conf+" %":"")};
+      $("fb").className="feedback ok"; $("fb").textContent=v.acc==="REG"?"Registrada para pago.":"Regla aplicada: "+(OCS.some(function(o){return o[0]===v.oc;})?"el total difiere más de 2 % de la OC":"la OC no existe")+" → enviada a revisión.";
+      renderInbox(); renderScore(); await sleep(220);
+    }
+    clearInterval(clk); R[k].secs=(Date.now()-start)/1000; $("clock").textContent=fmt(R[k].secs);
+    botBusy=false; $("go").disabled=false; $("go").textContent="Repetir";
+    $("r"+k+"st").textContent="✓ "+R[k].ok+" sin error · "+R[k].exc+" a persona";
+    $("msg").innerHTML=withAI?"<b>Ronda 3 terminada.</b> La IA resolvió los documentos no estructurados; solo uno, con baja confianza, quedó para una persona. Mira la proyección mensual.":"<b>Ronda 2 terminada.</b> Cero errores y mucho más rápido, pero 4 de 12 facturas no eran estructuradas y fueron a una persona. ¿Qué haría falta para automatizarlas? Pasa a la Ronda 3.";
+    renderScore(); renderProj();
+  }
+
+  // ---------- Marcador ----------
+  function renderScore(){
+    var names={1:"Humano",2:"Robot RPA",3:"Robot + IA"};
+    $("score").innerHTML=[1,2,3].map(function(k){
+      var r=R[k]; if(!r) return '<tr><td><b>'+names[k]+'</b></td><td class="pending" colspan="6" style="text-align:left">Pendiente</td></tr>';
+      var spf=r.done?(r.secs/r.done):0;
+      return '<tr><td><b>'+names[k]+'</b></td><td>'+r.done+' / 12</td><td><span class="pill ok">'+r.ok+'</span></td><td>'+(r.err?'<span class="pill bad">'+r.err+'</span>':'0')+'</td><td>'+(r.exc?'<span class="pill exc">'+r.exc+'</span>':(k===1?'—':'0'))+'</td><td>'+fmt(r.secs)+'</td><td>'+(r.done?spf.toFixed(1):'—')+'</td></tr>';
+    }).join("");
+    var t="Sé el Robot · ";
+    t+=R[1]?"Humano: "+R[1].done+"/12 en "+fmt(R[1].secs)+", "+R[1].err+(R[1].err===1?" error":" errores"):"Humano: pendiente";
+    if(R[2]) t+=" · Robot: "+R[2].done+"/12, 0 errores, "+R[2].exc+" excepciones";
+    if(R[3]) t+=" · Robot+IA: "+R[3].done+"/12, "+R[3].exc+" a validación humana";
+    $("shareTxt").value=t;
+  }
+  $("copy").onclick=function(){
+    var t=$("shareTxt").value, b=this;
+    var done=function(){b.textContent="Copiado"; setTimeout(function(){b.textContent="Copiar para el chat";},1500);};
+    try{ navigator.clipboard.writeText(t).then(done,function(){ $("shareTxt").select(); b.textContent="Selecciona y copia"; }); }
+    catch(e){ $("shareTxt").select(); b.textContent="Selecciona y copia"; }
+  };
+
+  // ---------- Proyección ----------
+  function renderProj(){
+    var n=+$("p_n").value||0, c=+$("p_c").value||0, th=+$("p_t").value||150;
+    var exc2=R[2]?R[2].exc/12:4/12, exc3=R[3]?R[3].exc/12:1/12;
+    var hM=n*th/3600, h2=n*exc2*th/3600, h3=n*exc3*th*1.0/3600 + n*(1-exc3)*0; // la validación humana usa el mismo tiempo manual
+    var rows=[["Manual",hM,"h"],["Robot RPA",h2,""],["Robot + IA",h3,"ia"]], max=Math.max(hM,h2,h3)||1;
+    $("bars").innerHTML=rows.map(function(r){return '<div class="brow '+r[2]+'"><span>'+r[0]+'</span><div class="track"><div class="fill" style="width:'+(r[1]/max*100).toFixed(1)+'%"></div></div><span class="v">'+Math.round(r[1])+' h · '+(r[1]/160).toFixed(1)+' FTE</span></div>';}).join("");
+    $("projNote").textContent="Horas de persona que quedan al mes. Ahorro frente al manual: RPA "+Math.round(hM-h2)+" h (USD "+Math.round((hM-h2)*c).toLocaleString("en-US")+"), RPA + IA "+Math.round(hM-h3)+" h (USD "+Math.round((hM-h3)*c).toLocaleString("en-US")+"). Supuestos: 160 h por FTE; las excepciones toman el mismo tiempo que el proceso manual; no incluye licencias ni mantenimiento del robot."+(R[1]?"":" Tiempo manual estimado: juega la Ronda 1 para usar el tuyo.");
+  }
+  ["p_n","p_c","p_t"].forEach(function(id){$(id).addEventListener("input",renderProj);});
+
+  setRound(1); renderScore(); renderProj();
+  window.__ser={INV:INV,R:R};
+})();
+</script>
+
+</body></html>

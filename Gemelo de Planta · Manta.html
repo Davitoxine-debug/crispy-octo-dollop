@@ -1,0 +1,459 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Gemelo de Planta · Manta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: control room — plant schematic + weekly plan + prediction on top, time-series chart across, scoreboard below */
+:root{
+  --bg:#edf1f4; --panel:#ffffff; --panel2:#f4f7f9; --line:#d3dbe3; --ink:#18202e; --mute:#5a6779;
+  --navy:#21295C; --teal:#0b6e8a; --sea:#1e9bb8; --amber:#c8811a; --amber-bg:#fcf1de;
+  --ok:#1d7a4c; --ok-bg:#e3f3ea; --bad:#b83a32; --bad-bg:#fbe8e6; --ghost:#8a97aa;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Barlow",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1421; --panel:#141d2e; --panel2:#1a2539; --line:#2a3852; --ink:#e7edf6; --mute:#98a6bd;
+  --navy:#a9bbff; --teal:#47b6d4; --sea:#5fd0ea; --amber:#f0b04c; --amber-bg:#3a2d16;
+  --ok:#4fcc8e; --ok-bg:#15352a; --bad:#ff7d72; --bad-bg:#3e1c1b; --ghost:#6f7f98; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1421; --panel:#141d2e; --panel2:#1a2539; --line:#2a3852; --ink:#e7edf6; --mute:#98a6bd;
+  --navy:#a9bbff; --teal:#47b6d4; --sea:#5fd0ea; --amber:#f0b04c; --amber-bg:#3a2d16;
+  --ok:#4fcc8e; --ok-bg:#15352a; --bad:#ff7d72; --bad-bg:#3e1c1b; --ghost:#6f7f98; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;margin:0}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:16px 40px;display:flex;flex-direction:column;gap:14px}
+h1,h2{font-family:var(--display);margin:0;text-wrap:balance}
+button,input,select{font-family:var(--body)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end}
+.brand{display:flex;flex-direction:column;gap:2px;min-width:0}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.brand h1{font-size:34px;color:var(--navy);line-height:1}
+.brand p{margin:2px 0 0;color:var(--mute);max-width:64ch}
+.rounds{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.round{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:8px 12px;text-align:left;display:flex;flex-direction:column;min-width:150px;cursor:pointer}
+.round b{font-family:var(--display);font-size:17px;letter-spacing:.01em}
+.round span{font-size:12.5px;color:var(--mute)}
+.round .st{color:var(--ok);font-weight:600;font-size:12px}
+.round[aria-pressed="true"]{border-color:var(--teal);box-shadow:inset 0 -3px 0 var(--teal);background:var(--panel2)}
+
+.msg{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:8px;padding:10px 14px}
+.msg b{color:var(--navy)}
+
+.grid3{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.9fr) minmax(0,.95fr);gap:12px;align-items:stretch}
+@media (max-width:1100px){.grid3{grid-template-columns:1fr 1fr}.plant{grid-column:1 / -1}}
+@media (max-width:720px){.grid3{grid-template-columns:1fr}}
+.pane{background:var(--panel);border:1px solid var(--line);border-radius:10px;min-width:0;display:flex;flex-direction:column}
+.pane-h{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 13px;border-bottom:1px solid var(--line)}
+.pane-h h2{font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.pane-h .tag{font-size:12px;color:var(--mute);font-family:var(--mono)}
+.pane-b{padding:12px 13px;display:flex;flex-direction:column;gap:10px;flex:1}
+
+/* plant */
+.svgwrap{overflow-x:auto}
+#plantSvg{width:100%;height:auto;display:block}
+.log{font-family:var(--mono);font-size:12.5px;background:var(--panel2);border-radius:8px;padding:8px 10px;max-height:120px;overflow:auto;display:flex;flex-direction:column;gap:3px}
+.log .f{color:var(--bad)} .log .m{color:var(--amber)} .log .o{color:var(--ok)} .log .n{color:var(--mute)}
+.sensors{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:520px){.sensors{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.sen{background:var(--panel2);border-radius:8px;padding:7px 9px;min-width:0}
+.sen .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.sen .v{font-family:var(--mono);font-size:18px;font-weight:600}
+.sen .v small{font-size:11px;color:var(--mute);font-weight:400;margin-left:3px}
+.sen.unknown .v{color:var(--ghost)}
+.sen.warn .v{color:var(--amber)} .sen.bad .v{color:var(--bad)}
+
+/* plan */
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);font-weight:600;display:flex;justify-content:space-between}
+.field label .num{color:var(--ink);font-size:14px;letter-spacing:0;text-transform:none}
+input[type=range]{width:100%;accent-color:var(--teal)}
+.check{display:flex;align-items:center;gap:8px;font-weight:600}
+.check input{width:18px;height:18px;accent-color:var(--teal)}
+.order{background:var(--amber-bg);border-radius:8px;padding:8px 10px;font-size:13.5px}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btn{border:0;border-radius:8px;padding:10px 14px;font-weight:700;font-size:14.5px;background:var(--teal);color:#fff;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--teal);border:1.5px solid var(--teal)}
+.btn.real{background:var(--navy);color:var(--panel)}
+.btn.amber{background:var(--amber);color:#1c1405}
+.btn[disabled]{opacity:.45;cursor:not-allowed;filter:none}
+
+/* prediction */
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kpi{background:var(--panel2);border-radius:8px;padding:8px 10px;min-width:0}
+.kpi .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.kpi .v{font-family:var(--mono);font-size:20px;font-weight:600}
+.kpi .s{font-size:12px;color:var(--mute)}
+.kpi.bad .v{color:var(--bad)} .kpi.ok .v{color:var(--ok)} .kpi.warn .v{color:var(--amber)}
+.info{font-size:13.5px;color:var(--ink);background:var(--panel2);border-radius:8px;padding:9px 11px}
+.info b{color:var(--navy)}
+.info table{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px}
+.info td{padding:2px 0;border-bottom:1px dashed var(--line)}
+.info td:last-child{text-align:right;font-family:var(--mono)}
+.recs{display:flex;flex-direction:column;gap:6px}
+.rec{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:13.5px;background:var(--panel2);border-radius:8px;padding:6px 8px;cursor:pointer;border:1px solid transparent}
+.rec:hover{border-color:var(--teal)}
+.rec b{font-family:var(--mono)}
+
+/* chart */
+.chartwrap{position:relative}
+#chart{width:100%;height:340px;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--mute)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:18px;height:3px;border-radius:2px}
+.legend i.dash{background:repeating-linear-gradient(90deg,var(--ghost) 0 5px,transparent 5px 9px)}
+
+/* score */
+.tbl{overflow-x:auto}
+.tbl table{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--mute);text-align:right;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--line);font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl th:first-child,.tbl td:first-child{text-align:left;font-family:var(--body)}
+.tbl td:first-child b{font-family:var(--display);font-size:16px}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600;font-family:var(--body)}
+.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.bad{background:var(--bad-bg);color:var(--bad)}
+.share{display:flex;gap:8px;flex-wrap:wrap;padding:10px 13px}
+.share textarea{flex:1 1 280px;min-width:0;height:54px;font-family:var(--mono);font-size:12px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 8px;resize:vertical}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <span class="eyebrow">Sesión 7 · Gemelos digitales · Atunera del Pacífico, Manta</span>
+      <h1>Gemelo de Planta</h1>
+      <p>Planifica una semana de producción de atún enlatado. El pedido no espera y la cerradora de latas está más gastada de lo que dice el papel. ¿Te alcanza con el manual, o necesitas un gemelo digital?</p>
+    </div>
+    <div class="rounds" role="group" aria-label="Rondas">
+      <button class="round" id="rb1" aria-pressed="true"><b>1 · Simulación tradicional</b><span>Modelo con datos de diseño</span><span class="st" id="st1"></span></button>
+      <button class="round" id="rb2" aria-pressed="false"><b>2 · Gemelo digital</b><span>Modelo calibrado con sensores</span><span class="st" id="st2"></span></button>
+      <button class="round" id="rb3" aria-pressed="false"><b>3 · Gemelo + optimización</b><span>El gemelo recomienda el plan</span><span class="st" id="st3"></span></button>
+    </div>
+  </div>
+
+  <div class="msg" id="msg" aria-live="polite"></div>
+
+  <div class="grid3">
+    <section class="pane plant" aria-label="Planta">
+      <div class="pane-h"><h2>Línea 2 · Enlatado</h2><span class="tag" id="clock">Hora 0 / 168</span></div>
+      <div class="pane-b">
+        <div class="svgwrap"><svg id="plantSvg" viewBox="0 0 600 170" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Esquema de la línea: cocinador, llenadora, cerradora, autoclave y etiquetado"></svg></div>
+        <div class="sensors">
+          <div class="sen" id="sVib"><div class="k">Vibración cerradora</div><div class="v">–<small>mm/s</small></div></div>
+          <div class="sen" id="sTmp"><div class="k">Temp. motor</div><div class="v">–<small>°C</small></div></div>
+          <div class="sen" id="sSpd"><div class="k">Velocidad</div><div class="v">–<small>latas/min</small></div></div>
+          <div class="sen unknown" id="sWear"><div class="k" id="sWearK">Desgaste</div><div class="v">?<small>%</small></div></div>
+        </div>
+        <div class="log" id="log" aria-live="polite"><div class="n">Bitácora de la semana: sin eventos todavía.</div></div>
+      </div>
+    </section>
+
+    <section class="pane" aria-label="Plan de la semana">
+      <div class="pane-h"><h2>Plan de la semana</h2><span class="tag">168 h · 24/7</span></div>
+      <div class="pane-b">
+        <div class="order"><b>Pedido:</b> <span class="num">2.750.000</span> latas buenas para exportación, en 7 días. Lo que falte se paga con multa.</div>
+        <div class="field"><label for="spd">Velocidad de la línea <span class="num" id="spdV">300 latas/min</span></label><input id="spd" type="range" min="260" max="380" step="10" value="300"></div>
+        <label class="check"><input id="mOn" type="checkbox"> Programar mantenimiento preventivo (6 h)</label>
+        <div class="field" id="mField"><label for="mh">Inicio del mantenimiento <span class="num" id="mhV">hora 48 · día 3</span></label><input id="mh" type="range" min="0" max="156" step="6" value="48" disabled></div>
+        <div class="btns">
+          <button class="btn" id="simBtn">Simular plan</button>
+          <button class="btn amber" id="optBtn" hidden>Pedir recomendación</button>
+          <button class="btn real" id="runBtn">Ejecutar en la planta real</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="pane" aria-label="Predicción">
+      <div class="pane-h"><h2 id="predTitle">Lo que dice el modelo</h2><span class="tag" id="predTag"></span></div>
+      <div class="pane-b">
+        <div class="kpis" id="kpis"></div>
+        <div class="info" id="info"></div>
+        <div class="recs" id="recs"></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="pane" aria-label="Gráfico">
+    <div class="pane-h"><h2>Desgaste de la cerradora y producción acumulada</h2><span class="tag">horas 0–168</span></div>
+    <div class="pane-b">
+      <div class="legend" id="legend">
+        <span><i class="dash"></i>Modelo de diseño</span>
+        <span><i style="background:var(--sea)"></i>Gemelo digital (mediana y rango P10–P90)</span>
+        <span><i style="background:var(--navy)"></i>Planta real</span>
+        <span><i style="background:var(--amber)"></i>Mantenimiento</span>
+        <span><i style="background:var(--bad)"></i>Falla</span>
+      </div>
+      <div class="chartwrap"><canvas id="chart" aria-label="Gráfico de desgaste y producción"></canvas></div>
+    </div>
+  </section>
+
+  <section class="pane" aria-label="Marcador">
+    <div class="pane-h"><h2>Marcador · semanas ejecutadas en la planta real</h2><span class="tag">Margen = USD 0,10 por lata del pedido (el excedente no tiene comprador esta semana) − mantenimiento − fallas − energía − multa</span></div>
+    <div class="tbl"><table>
+      <thead><tr><th>Ronda</th><th>Plan</th><th>Latas buenas</th><th>Pedido</th><th>Fallas</th><th>Horas paradas</th><th>kWh / 1.000 latas</th><th>Margen neto USD</th></tr></thead>
+      <tbody id="score"></tbody>
+    </table></div>
+    <div class="share"><textarea id="shareTxt" readonly aria-label="Resultado para compartir"></textarea><button class="btn ghost" id="copy">Copiar para el chat</button></div>
+  </section>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  // ================= Modelo =================
+  var H=168, ORDER=2750000, PRICE=0.10, EXTRA=0, PENALTY=0.12, PM_COST=3000, PM_H=6, CM_COST=15000, CM_H=30, TARIFF=0.10;
+  var DESIGN={w0:20, k:0.21};               // ficha y registro de mantenimiento
+  var REAL={w0:46, k:0.27, E:[0.75,1.30,0.90,1.10]}; // planta real (oculta)
+  function hazard(w){ var x=Math.max(0,w-55); return 0.0004+0.00005*x*x; }
+  function defects(w,s){ return 0.008+0.0006*Math.max(0,w-50)+0.0004*Math.max(0,s-320); }
+  function kwh(s,run){ return run?(280+1.3*s):120; }
+  function simulate(plan,p,opt){
+    opt=opt||{};
+    var w=p.w0, k=p.k, s=plan.s, cum=0, ei=0, E=p.E?p.E[0]:Infinity, down=0, good=0, energy=0, cost=0, fails=0, downH=0;
+    var W=new Array(H+1), G=new Array(H+1), ev=[], did=false;
+    W[0]=w; G[0]=0;
+    for(var h=0;h<H;h++){
+      if(plan.m && !did && h===plan.mh && down===0){ down=PM_H; cost+=PM_COST; w=5; cum=0; did=true; ev.push({h:h,t:"m"}); }
+      if(down>0){ down--; downH++; energy+=kwh(s,false); W[h+1]=w; G[h+1]=good; continue; }
+      cum+=hazard(w);
+      var failed = opt.rule ? (w>=85) : (cum>=E);
+      if(failed){ fails++; cost+=CM_COST; ev.push({h:h,t:"f"}); w=5; cum=0; ei++; E=p.E?(p.E[ei]!==undefined?p.E[ei]:1):Infinity; down=CM_H-1; downH++; energy+=kwh(s,false); W[h+1]=w; G[h+1]=good; continue; }
+      good+=s*60*(1-defects(w,s)); w+=k*(s/300)*(s/300); energy+=kwh(s,true);
+      W[h+1]=w; G[h+1]=good;
+    }
+    var short=Math.max(0,ORDER-good), pen=short*PENALTY, eCost=energy*TARIFF;
+    return {W:W,G:G,ev:ev,good:good,fails:fails,downH:downH,energy:energy,kwhK:energy/(good/1000),maint:cost,pen:pen,margin:Math.min(good,ORDER)*PRICE+Math.max(0,good-ORDER)*EXTRA-cost-eCost-pen,met:good>=ORDER};
+  }
+  // RNG determinista
+  function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; var t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+  function gauss(r){ var u=0,v=0; while(!u)u=r(); while(!v)v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+
+  // Historia de sensores (48 h previas, misma para todos)
+  var HIST=[], hr=rng(7);
+  for(var t=-48;t<=0;t++){ var w=REAL.w0+REAL.k*t; HIST.push({t:t, vib:1.8+0.055*w+gauss(hr)*0.12, tmp:52+0.12*w+gauss(hr)*0.4}); }
+  // Calibración del gemelo: inversión del modelo de sensor + regresión lineal
+  var CAL=(function(){
+    var xs=HIST.map(function(d){return d.t;}), ys=HIST.map(function(d){return (d.vib-1.8)/0.055;});
+    var n=xs.length, mx=xs.reduce(function(a,b){return a+b;})/n, my=ys.reduce(function(a,b){return a+b;})/n, sxx=0, sxy=0;
+    for(var i=0;i<n;i++){ sxx+=(xs[i]-mx)*(xs[i]-mx); sxy+=(xs[i]-mx)*(ys[i]-my); }
+    var b=sxy/sxx, a=my-b*mx, res=0; for(i=0;i<n;i++){ var e=ys[i]-(a+b*xs[i]); res+=e*e; }
+    var sd=Math.sqrt(res/(n-2)), seB=sd/Math.sqrt(sxx), seA=sd*Math.sqrt(1/n+mx*mx/sxx);
+    return {w0:a, k:b, seW:seA, seK:seB};
+  })();
+  function monteCarlo(plan,N,seed){
+    var r=rng(seed||11), res=[];
+    for(var i=0;i<N;i++){
+      var p={w0:CAL.w0+gauss(r)*CAL.seW, k:Math.max(0.05,CAL.k+gauss(r)*CAL.seK), E:[-Math.log(r()),-Math.log(r()),-Math.log(r()),-Math.log(r())]};
+      res.push(simulate(plan,p));
+    }
+    var goods=res.map(function(x){return x.good;}).sort(function(a,b){return a-b;});
+    var q=function(a,pc){return a[Math.min(a.length-1,Math.floor(pc*a.length))];};
+    var band={lo:[],md:[],hi:[]};
+    for(var h=0;h<=H;h++){ var col=res.map(function(x){return x.W[h];}).sort(function(a,b){return a-b;}); band.lo.push(q(col,.1)); band.md.push(q(col,.5)); band.hi.push(q(col,.9)); }
+    var mean=function(f){return res.reduce(function(a,x){return a+f(x);},0)/N;};
+    return {pFail:mean(function(x){return x.fails>0?1:0;}), pMet:mean(function(x){return x.met?1:0;}), g10:q(goods,.1), g50:q(goods,.5), g90:q(goods,.9), margin:mean(function(x){return x.margin;}), kwhK:mean(function(x){return x.kwhK;}), band:band};
+  }
+
+  // ================= Estado y vista =================
+  var round=1, view={design:null, twin:null, real:null, runH:H}, running=false, done={};
+  var nf=function(x){return Math.round(x).toLocaleString("es-EC");};
+  var usd=function(x){return (x<0?"−":"")+"USD "+Math.abs(Math.round(x)).toLocaleString("es-EC");};
+  function plan(){ return {s:+$("spd").value, m:$("mOn").checked, mh:+$("mh").value}; }
+  function planTxt(p){ return p.s+" latas/min · "+(p.m?"mant. h "+p.mh:"sin mant."); }
+  function updPlanLabels(){
+    $("spdV").textContent=$("spd").value+" latas/min";
+    var h=+$("mh").value; $("mhV").textContent="hora "+h+" · día "+(Math.floor(h/24)+1);
+    $("mh").disabled=!$("mOn").checked; $("mField").style.opacity=$("mOn").checked?1:.5;
+  }
+  ["spd","mh","mOn"].forEach(function(id){ $(id).addEventListener("input",function(){ updPlanLabels(); view.design=null; view.twin=null; if(!running){ view.real=null; renderPred(); draw(); } }); });
+
+  // ---------- Planta (SVG) ----------
+  var ST=[["Cocinador",30],["Llenadora",145],["Cerradora",260],["Autoclave",375],["Etiquetado",490]];
+  function plantSvg(){
+    var s='<defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--mute)"/></marker></defs>';
+    s+='<line x1="20" y1="100" x2="590" y2="100" stroke="var(--line)" stroke-width="10" stroke-linecap="round"/>';
+    ST.forEach(function(st,i){
+      var x=st[1], crit=i===2;
+      s+='<rect x="'+x+'" y="'+(crit?42:52)+'" width="86" height="'+(crit?72:58)+'" rx="8" fill="var(--panel2)" stroke="'+(crit?'var(--teal)':'var(--line)')+'" stroke-width="'+(crit?2.5:1.5)+'" id="'+(crit?'crit':'st'+i)+'"/>';
+      s+='<text x="'+(x+43)+'" y="'+(crit?136:128)+'" text-anchor="middle" font-size="13" font-family="Barlow, Arial, sans-serif" font-weight="600" fill="var(--ink)">'+st[0]+'</text>';
+      if(crit){ s+='<text x="'+(x+43)+'" y="70" text-anchor="middle" font-size="11" font-family="JetBrains Mono, monospace" fill="var(--mute)">desgaste</text><text id="critW" x="'+(x+43)+'" y="92" text-anchor="middle" font-size="18" font-weight="600" font-family="JetBrains Mono, monospace" fill="var(--ghost)">?</text>'; s+='<text x="'+(x+43)+'" y="30" text-anchor="middle" font-size="11" font-family="Barlow, Arial, sans-serif" font-weight="700" fill="var(--teal)">ACTIVO CRÍTICO</text>'; }
+      if(i<4) s+='<line x1="'+(x+88)+'" y1="81" x2="'+(ST[i+1][1]-4)+'" y2="81" stroke="var(--mute)" stroke-width="1.5" marker-end="url(#ar)"/>';
+    });
+    for(var c=0;c<14;c++) s+='<circle class="can" cx="'+(20+c*42)+'" cy="100" r="5" fill="var(--sea)"/>';
+    s+='<text id="plantState" x="20" y="160" font-size="13" font-family="Barlow, Arial, sans-serif" fill="var(--mute)">Línea detenida. Elige un plan.</text>';
+    $("plantSvg").innerHTML=s;
+  }
+  var canOffset=0;
+  function animateCans(speed,running){ canOffset=(canOffset+(running?speed/60:0))%42; var cs=document.querySelectorAll(".can"); for(var i=0;i<cs.length;i++){ cs[i].setAttribute("cx",20+((i*42+canOffset)%588)); cs[i].style.opacity=running?1:.35; } }
+  function setSensors(h,w,s,state,known){
+    var vib=1.8+0.055*w, tmp=52+0.12*w+0.02*(s-300);
+    $("sVib").querySelector(".v").innerHTML=(state==="run"?vib.toFixed(2):"0.00")+"<small>mm/s</small>";
+    $("sTmp").querySelector(".v").innerHTML=(state==="run"?tmp.toFixed(1):"–")+"<small>°C</small>";
+    $("sSpd").querySelector(".v").innerHTML=(state==="run"?s:0)+"<small>latas/min</small>";
+    var sw=$("sWear"); sw.className="sen"+(known?(w>75?" bad":w>55?" warn":""):" unknown");
+    sw.querySelector(".v").innerHTML=(known?Math.round(w):"?")+"<small>%</small>";
+    var cw=$("critW"); cw.textContent=known?Math.round(w)+" %":"?"; cw.setAttribute("fill",known?(w>75?"var(--bad)":w>55?"var(--amber)":"var(--ok)"):"var(--ghost)");
+    $("crit").setAttribute("stroke",state==="fail"?"var(--bad)":state==="maint"?"var(--amber)":"var(--teal)");
+    $("plantState").textContent=state==="fail"?"FALLA de la cerradora: parada correctiva de 30 h.":state==="maint"?"Mantenimiento preventivo en curso (6 h).":state==="run"?"Produciendo a "+s+" latas/min.":"Línea detenida. Elige un plan.";
+    $("clock").textContent="Hora "+h+" / 168";
+  }
+
+  // ---------- Predicción ----------
+  function kpi(k,v,s,cls){ return '<div class="kpi '+(cls||"")+'"><div class="k">'+k+'</div><div class="v">'+v+'</div><div class="s">'+(s||"")+'</div></div>'; }
+  function renderPred(){
+    $("recs").innerHTML="";
+    if(round===1){
+      $("predTitle").textContent="Lo que dice el modelo"; $("predTag").textContent="datos de diseño";
+      $("info").innerHTML='<b>Ficha técnica y registro</b><table><tr><td>Desgaste según último registro</td><td>20 %</td></tr><tr><td>Tasa de desgaste del fabricante</td><td>0,21 %/h</td></tr><tr><td>Límite de operación segura</td><td>85 %</td></tr><tr><td>Último mantenimiento</td><td>hace 3 semanas</td></tr></table>';
+      var d=view.design;
+      $("kpis").innerHTML = d ? kpi("Latas buenas",nf(d.good),d.met?"cumple el pedido":"no cumple",d.met?"ok":"bad")+kpi("Fallas previstas",d.fails,"según límite de 85 %",d.fails?"bad":"ok")+kpi("Desgaste al final",Math.round(d.W[H])+" %","")+kpi("Margen neto",usd(d.margin),"") : kpi("Latas buenas","–","Pulsa «Simular plan»")+kpi("Fallas previstas","–")+kpi("Desgaste al final","–")+kpi("Margen neto","–");
+    } else {
+      $("predTitle").textContent="Lo que dice el gemelo"; $("predTag").textContent="300 escenarios";
+      var faster=Math.round((CAL.k/DESIGN.k-1)*100);
+      $("info").innerHTML='<b>Calibración con sensores (últimas 48 h)</b><table><tr><td>Desgaste actual estimado</td><td>'+CAL.w0.toFixed(0)+' % ± '+(1.645*CAL.seW).toFixed(1)+'</td></tr><tr><td>Tasa de desgaste observada</td><td>'+CAL.k.toFixed(2).replace(".",",")+' %/h</td></tr><tr><td>Frente a la ficha del fabricante</td><td>'+(faster>=0?"+":"")+faster+' %</td></tr><tr><td>Riesgo de falla</td><td>crece sobre 55 %</td></tr></table><canvas id="hist" style="width:100%;height:60px;display:block;margin-top:6px" aria-label="Vibración últimas 48 horas"></canvas>';
+      drawHist();
+      var t=view.twin;
+      $("kpis").innerHTML = t ? kpi("Prob. de falla",Math.round(t.pFail*100)+" %","en la semana",t.pFail>0.3?"bad":t.pFail>0.1?"warn":"ok")+kpi("Prob. de cumplir",Math.round(t.pMet*100)+" %","el pedido",t.pMet<0.7?"bad":t.pMet<0.9?"warn":"ok")+kpi("Latas buenas (P50)",nf(t.g50),"P10 "+nf(t.g10)+" · P90 "+nf(t.g90))+kpi("Margen esperado",usd(t.margin),"") : kpi("Prob. de falla","–","Pulsa «Simular plan»")+kpi("Prob. de cumplir","–")+kpi("Latas buenas (P50)","–")+kpi("Margen esperado","–");
+    }
+  }
+  function drawHist(){
+    var c=$("hist"); if(!c) return; var dpr=window.devicePixelRatio||1, w=c.clientWidth, h=60; c.width=w*dpr; c.height=h*dpr; var x=c.getContext("2d"); x.scale(dpr,dpr);
+    var cs=getComputedStyle(document.documentElement), col=cs.getPropertyValue("--sea").trim(), mute=cs.getPropertyValue("--mute").trim();
+    var vs=HIST.map(function(d){return d.vib;}), lo=Math.min.apply(null,vs)-0.1, hi=Math.max.apply(null,vs)+0.1;
+    x.strokeStyle=col; x.lineWidth=1.5; x.beginPath();
+    HIST.forEach(function(d,i){ var px=4+i/(HIST.length-1)*(w-8), py=h-14-(d.vib-lo)/(hi-lo)*(h-22); if(i)x.lineTo(px,py); else x.moveTo(px,py); }); x.stroke();
+    x.fillStyle=mute; x.font="11px JetBrains Mono, monospace"; x.fillText("vibración −48 h → ahora: "+vs[0].toFixed(2)+" → "+vs[vs.length-1].toFixed(2)+" mm/s",4,h-2);
+  }
+
+  // ---------- Gráfico ----------
+  function draw(){
+    var c=$("chart"), dpr=window.devicePixelRatio||1, W=c.clientWidth, Hh=340; c.width=W*dpr; c.height=Hh*dpr;
+    var x=c.getContext("2d"); x.scale(dpr,dpr); x.clearRect(0,0,W,Hh);
+    var cs=getComputedStyle(document.documentElement), C=function(n){return cs.getPropertyValue(n).trim();};
+    var L=46, R=W-16, top1=12, bot1=170, top2=200, bot2=318;
+    var X=function(h){return L+(h/H)*(R-L);};
+    var Y1=function(w){return bot1-(Math.min(100,Math.max(0,w))/100)*(bot1-top1);};
+    var maxG=3300000, Y2=function(g){return bot2-(g/maxG)*(bot2-top2);};
+    x.font="11px JetBrains Mono, monospace"; x.fillStyle=C("--mute"); x.strokeStyle=C("--line"); x.lineWidth=1;
+    [0,25,55,85,100].forEach(function(v){ x.beginPath(); x.moveTo(L,Y1(v)); x.lineTo(R,Y1(v)); x.stroke(); x.fillText(v+"%",8,Y1(v)+4); });
+    x.fillStyle=C("--bad"); x.globalAlpha=.07; x.fillRect(L,Y1(100),R-L,Y1(55)-Y1(100)); x.globalAlpha=1;
+    x.fillStyle=C("--mute"); x.fillText("zona de riesgo > 55 %",R-150,Y1(57));
+    [0,1000000,2000000,3000000].forEach(function(v){ x.strokeStyle=C("--line"); x.beginPath(); x.moveTo(L,Y2(v)); x.lineTo(R,Y2(v)); x.stroke(); x.fillStyle=C("--mute"); x.fillText((v/1e6)+" M",10,Y2(v)+4); });
+    for(var d=0;d<=7;d++){ x.fillStyle=C("--mute"); if(d<7) x.fillText("día "+(d+1),X(d*24)+4,bot2+16); x.strokeStyle=C("--line"); x.beginPath(); x.moveTo(X(d*24),top1); x.lineTo(X(d*24),bot2); x.stroke(); }
+    x.fillStyle=C("--ink"); x.font="600 12px Barlow, Arial"; x.fillText("Desgaste de la cerradora",L+4,top1+12); x.fillText("Latas buenas acumuladas",L+4,top2+12);
+    // pedido
+    x.strokeStyle=C("--amber"); x.setLineDash([6,4]); x.lineWidth=1.5; x.beginPath(); x.moveTo(L,Y2(ORDER)); x.lineTo(R,Y2(ORDER)); x.stroke(); x.setLineDash([]);
+    x.fillStyle=C("--amber"); x.font="11px JetBrains Mono, monospace"; x.fillText("pedido 2,75 M",X(80),Y2(ORDER)-5);
+    function line(arr,Y,col,wd,dash,upto){ if(!arr) return; x.strokeStyle=col; x.lineWidth=wd; x.setLineDash(dash||[]); x.beginPath(); var n=upto===undefined?H:upto; for(var h=0;h<=n;h++){ var px=X(h),py=Y(arr[h]); if(h)x.lineTo(px,py); else x.moveTo(px,py);} x.stroke(); x.setLineDash([]); }
+    if(view.twin){ var b=view.twin.band; x.fillStyle=C("--sea"); x.globalAlpha=.18; x.beginPath(); for(var h=0;h<=H;h++) x.lineTo(X(h),Y1(b.hi[h])); for(h=H;h>=0;h--) x.lineTo(X(h),Y1(b.lo[h])); x.closePath(); x.fill(); x.globalAlpha=1; line(b.md,Y1,C("--sea"),2.5); }
+    if(view.design){ line(view.design.W,Y1,C("--ghost"),2,[6,5]); line(view.design.G,Y2,C("--ghost"),2,[6,5]); }
+    if(view.real){
+      var r=view.real, n=view.runH;
+      line(r.W,Y1,C("--navy"),3,null,n); line(r.G,Y2,C("--navy"),3,null,n);
+      r.ev.forEach(function(e){ if(e.h>n) return; x.fillStyle=e.t==="f"?C("--bad"):C("--amber"); var w=e.t==="f"?CM_H:PM_H; x.globalAlpha=.22; x.fillRect(X(e.h),top1,X(Math.min(H,e.h+w))-X(e.h),bot2-top1); x.globalAlpha=1; x.font="600 11px Barlow, Arial"; x.fillText(e.t==="f"?"FALLA":"MANT.",X(e.h)+3,top1+26); });
+      var last=r.G[n]; x.fillStyle=C("--navy"); x.beginPath(); x.arc(X(n),Y2(last),4,0,7); x.fill(); x.font="11px JetBrains Mono, monospace"; x.fillText((last/1e6).toFixed(2)+" M",Math.min(X(n)+6,R-60),Y2(last)-8);
+    }
+  }
+
+  // ---------- Rondas ----------
+  var MSG={
+    1:"<b>Ronda 1 · Simulación tradicional.</b> Tienes la ficha del fabricante y el último registro de mantenimiento. Arma tu plan, simúlalo y, cuando estés conforme, ejecútalo en la planta real.",
+    2:"<b>Ronda 2 · Gemelo digital.</b> Ahora el modelo está conectado a los sensores de la cerradora y se calibró con las últimas 48 horas. Prueba todos los planes que quieras en el gemelo: equivocarse aquí es gratis. Luego ejecuta en la planta real.",
+    3:"<b>Ronda 3 · Gemelo + optimización.</b> El gemelo evalúa cientos de planes y recomienda los mejores. Elige uno (o mejóralo) y ejecútalo. ¿Le ganaste a la máquina en la Ronda 2?"
+  };
+  function setRound(n){
+    if(running) return; round=n;
+    [1,2,3].forEach(function(i){$("rb"+i).setAttribute("aria-pressed",String(i===n));});
+    $("msg").innerHTML=MSG[n]; $("optBtn").hidden=n!==3; $("simBtn").textContent=n===1?"Simular plan":"Simular en el gemelo";
+    view={design:null,twin:null,real:null,runH:H}; renderPred(); draw();
+    setSensors(0,REAL.w0,+$("spd").value,"stop",n>1);
+    if(n>1){ $("sWearK").textContent="Desgaste (estimado)"; $("sWear").querySelector(".v").innerHTML=Math.round(CAL.w0)+"<small>%</small>"; } else $("sWearK").textContent="Desgaste";
+  }
+  [1,2,3].forEach(function(i){ $("rb"+i).onclick=function(){ setRound(i); }; });
+
+  $("simBtn").onclick=function(){
+    var p=plan();
+    if(round===1){ view.design=simulate(p,DESIGN,{rule:true}); }
+    else { view.design=simulate(p,DESIGN,{rule:true}); view.twin=monteCarlo(p,300,11); }
+    renderPred(); draw();
+  };
+  $("optBtn").onclick=function(){
+    var btn=this; btn.disabled=true; btn.textContent="Evaluando planes…";
+    setTimeout(function(){
+      var cands=[];
+      for(var s=260;s<=380;s+=10){
+        cands.push({s:s,m:false,mh:0});
+        for(var mh=0;mh<=156;mh+=6) cands.push({s:s,m:true,mh:mh});
+      }
+      cands.forEach(function(c){ var t=monteCarlo(c,60,23); c.margin=t.margin; c.pFail=t.pFail; c.pMet=t.pMet; });
+      cands.sort(function(a,b){return b.margin-a.margin;});
+      var top=cands.slice(0,3);
+      $("recs").innerHTML='<div style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);font-weight:600">'+cands.length+' planes evaluados · 3 mejores</div>'+top.map(function(c,i){return '<div class="rec" data-i="'+i+'" tabindex="0"><b>'+(i+1)+'</b><span>'+planTxt(c)+' · falla '+Math.round(c.pFail*100)+' %</span><b>'+usd(c.margin)+'</b></div>';}).join("");
+      bindRecs(top);
+      btn.disabled=false; btn.textContent="Pedir recomendación";
+    },30);
+  };
+  function bindRecs(top){
+    Array.prototype.forEach.call(document.querySelectorAll(".rec"),function(el){
+      var apply=function(){ var c=top[+el.dataset.i]; $("spd").value=c.s; $("mOn").checked=c.m; $("mh").value=c.mh; updPlanLabels(); view.design=simulate(c,DESIGN,{rule:true}); view.twin=monteCarlo(c,300,11); var keep=$("recs").innerHTML; renderPred(); $("recs").innerHTML=keep; bindRecs(top); draw(); };
+      el.onclick=apply; el.onkeydown=function(e){ if(e.key==="Enter") apply(); };
+    });
+  }
+
+  $("runBtn").onclick=function(){
+    if(running) return; running=true;
+    var p=plan(), r=simulate(p,REAL);
+    if(!view.design) view.design=simulate(p,DESIGN,{rule:true});
+    view.real=r; view.runH=0; var logged={}; $("log").innerHTML='<div class="n">h 0 · arranque a '+p.s+' latas/min</div>';
+    var addLog=function(cls,txt){ var d=document.createElement("div"); d.className=cls; d.textContent=txt; $("log").appendChild(d); $("log").scrollTop=1e6; };
+    ["runBtn","simBtn","optBtn","spd","mOn","mh"].forEach(function(id){$(id).disabled=true;});
+    var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var h=0, stepMs=reduce?0:38;
+    function stateAt(h){ for(var i=0;i<r.ev.length;i++){ var e=r.ev[i], d=e.t==="f"?CM_H:PM_H; if(h>=e.h && h<e.h+d) return e.t==="f"?"fail":"maint"; } return "run"; }
+    function step(){
+      h=Math.min(H,h+(reduce?H:2)); view.runH=h; var st=stateAt(Math.max(0,h-1));
+      setSensors(h,r.W[h],p.s,st,round>1); animateCans(p.s,st==="run"); draw();
+      r.ev.forEach(function(e,i){ if(!logged[i] && e.h<=h){ logged[i]=1; addLog(e.t==="f"?"f":"m", "h "+e.h+" · "+(e.t==="f"?"FALLA de la cerradora · 30 h detenida · USD 15.000":"mantenimiento preventivo · 6 h · USD 3.000")); } });
+      if(h>=H) addLog(r.met?"o":"f","h 168 · fin: "+nf(r.good)+" latas buenas · "+(r.met?"pedido cumplido":"faltan "+nf(ORDER-r.good)));
+      if(st==="fail") $("msg").innerHTML="<b>Hora "+h+":</b> la cerradora falló. Parada correctiva de 30 horas y USD 15.000 en reparación.";
+      if(h<H) setTimeout(step,stepMs); else finish(p,r);
+    }
+    step();
+  };
+  function finish(p,r){
+    running=false; ["runBtn","simBtn","optBtn","spd","mOn","mh"].forEach(function(id){$(id).disabled=false;}); updPlanLabels();
+    done[round]={p:p,r:r}; $("st"+round).textContent="✓ "+usd(r.margin);
+    var d=view.design;
+    var lesson = round===1 ? (r.fails? "La simulación prometía "+nf(d.good)+" latas sin fallas. La planta real produjo "+nf(r.good)+" y la cerradora falló: el modelo usaba un desgaste de 20 % y la máquina estaba en "+REAL.w0+" %, gastándose 29 % más rápido que la ficha. Pasa a la Ronda 2." : "Te fue bien, pero ¿fue por el modelo o por intuición? El modelo de diseño nunca vio el desgaste real ("+REAL.w0+" %). Pasa a la Ronda 2 para ver lo que veía el gemelo.")
+      : round===2 ? "Semana cerrada con "+usd(r.margin)+" de margen. La línea azul muestra el desgaste real, que ahora se revela: compáralo con la banda del gemelo y con la línea punteada del modelo de diseño."
+      : "Semana cerrada con "+usd(r.margin)+". Compara tus tres rondas en el marcador: ¿qué aportó el gemelo y qué aportó la optimización?";
+    $("msg").innerHTML="<b>Resultado.</b> "+lesson;
+    setSensors(H,r.W[H],p.s,"stop",true);
+    renderScore(); draw();
+  }
+
+  // ---------- Marcador ----------
+  function renderScore(){
+    var names={1:"Simulación tradicional",2:"Gemelo digital",3:"Gemelo + optimización"};
+    $("score").innerHTML=[1,2,3].map(function(k){
+      var d=done[k]; if(!d) return '<tr><td><b>'+names[k]+'</b></td><td colspan="7" style="text-align:left;color:var(--mute);font-family:var(--body);font-style:italic">Pendiente</td></tr>';
+      var r=d.r; return '<tr><td><b>'+names[k]+'</b></td><td style="font-family:var(--body)">'+planTxt(d.p)+'</td><td>'+nf(r.good)+'</td><td>'+(r.met?'<span class="pill ok">Cumple</span>':'<span class="pill bad">Falta '+nf(ORDER-r.good)+'</span>')+'</td><td>'+r.fails+'</td><td>'+r.downH+'</td><td>'+r.kwhK.toFixed(0)+'</td><td>'+usd(r.margin)+'</td></tr>';
+    }).join("");
+    var t="Gemelo de Planta · "+[1,2,3].map(function(k){var d=done[k]; return d?("R"+k+" "+planTxt(d.p)+": "+usd(d.r.margin)+(d.r.fails?", "+d.r.fails+" falla":"")):("R"+k+" pendiente");}).join(" | ");
+    $("shareTxt").value=t;
+  }
+  $("copy").onclick=function(){ var b=this, t=$("shareTxt").value; var ok=function(){b.textContent="Copiado"; setTimeout(function(){b.textContent="Copiar para el chat";},1500);};
+    try{ navigator.clipboard.writeText(t).then(ok,function(){ $("shareTxt").select(); b.textContent="Selecciona y copia"; }); }catch(e){ $("shareTxt").select(); b.textContent="Selecciona y copia"; } };
+
+  plantSvg(); updPlanLabels(); setRound(1); renderScore(); animateCans(300,false);
+  window.addEventListener("resize",function(){ draw(); drawHist(); });
+  window.__dt={simulate:simulate,REAL:REAL,DESIGN:DESIGN,CAL:CAL,monteCarlo:monteCarlo};
+})();
+</script>
+
+</body></html>

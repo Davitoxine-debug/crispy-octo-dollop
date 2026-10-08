@@ -1,0 +1,368 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>
+<title>Guía de la Materia · Tecnologías Emergentes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: reference handbook — stack hero, unit strip, technology cards, toolbox, ideas, searchable glossary, simulators */
+:root{
+  --bg:#eef2f5; --panel:#ffffff; --panel2:#f3f6f9; --line:#d4dce5; --ink:#18202e; --mute:#5b687b;
+  --navy:#21295C; --teal:#0b6e8a; --sea:#1e9bb8; --amber:#c8811a; --amber-bg:#fcf1de; --bad:#b83a32; --ok:#1d7a4c;
+  --l1:#21295C; --l2:#065A82; --l3:#1C7293; --onl:#ffffff;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Barlow",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1421; --panel:#141d2e; --panel2:#1a2539; --line:#2a3852; --ink:#e7edf6; --mute:#98a6bd;
+  --navy:#a9bbff; --teal:#47b6d4; --sea:#5fd0ea; --amber:#f0b04c; --amber-bg:#3a2d16; --bad:#ff7d72; --ok:#4fcc8e;
+  --l1:#2b3a78; --l2:#0f5f86; --l3:#1a7da0; --onl:#ffffff; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1421; --panel:#141d2e; --panel2:#1a2539; --line:#2a3852; --ink:#e7edf6; --mute:#98a6bd;
+  --navy:#a9bbff; --teal:#47b6d4; --sea:#5fd0ea; --amber:#f0b04c; --amber-bg:#3a2d16; --bad:#ff7d72; --ok:#4fcc8e;
+  --l1:#2b3a78; --l2:#0f5f86; --l3:#1a7da0; --onl:#ffffff; color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:24px 56px;display:flex;flex-direction:column;gap:40px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.005em}
+h2{font-size:30px;color:var(--navy)}
+h3{font-size:21px}
+p{margin:0}
+a{color:var(--teal)}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.sec{display:flex;flex-direction:column;gap:16px;scroll-margin-top:16px}
+.sec > .lead{color:var(--mute);max-width:70ch}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr}}
+.hero h1{font-size:56px;color:var(--navy);line-height:.95}
+.hero .sub{font-size:19px;color:var(--ink);margin-top:10px;max-width:46ch}
+.hero .meta{font-size:14px;color:var(--mute);margin-top:12px}
+nav.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+nav.toc a{font-size:14px;font-weight:600;text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:6px 12px}
+nav.toc a:hover{border-color:var(--sea)}
+.stack{display:flex;flex-direction:column;gap:5px}
+.layer{display:grid;grid-template-columns:112px minmax(0,1fr) auto;gap:10px;align-items:center;border-radius:8px;padding:9px 12px;color:var(--onl);font-size:14.5px}
+.layer b{font-family:var(--display);font-size:17px;color:var(--amber)}
+.layer span.r{font-size:13px;opacity:.9;text-align:right}
+@media (max-width:480px){.layer{grid-template-columns:96px minmax(0,1fr)}.layer span.r{display:none}}
+.stack .cap{font-size:13px;color:var(--mute);text-align:center;margin-top:4px}
+
+/* units */
+.units{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.units{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.units{grid-template-columns:1fr}}
+.unit{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.unit .uh{font-family:var(--display);font-size:20px;color:var(--navy)}
+.unit ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.unit li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:8px;font-size:14.5px}
+.unit li .n{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--teal);padding-top:1px}
+.unit li b{display:block}
+.unit li span{color:var(--mute);font-size:13.5px}
+
+/* tech cards */
+.techs{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.tech{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.tech .th{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.tech .th h3{color:var(--navy);font-size:24px}
+.tech .ses{font-family:var(--mono);font-size:12px;color:var(--mute)}
+.tech dl{margin:0;display:grid;grid-template-columns:96px minmax(0,1fr);gap:6px 10px;font-size:14.5px}
+.tech dt{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--mute);font-weight:600;padding-top:3px}
+.tech dd{margin:0}
+.tech dd.no{color:var(--bad)}
+.tech .quote{border-left:3px solid var(--amber);padding:4px 0 4px 10px;font-weight:600;font-size:15px}
+.tech .num{font-family:var(--mono);font-size:13px;color:var(--teal);background:var(--panel2);border-radius:6px;padding:6px 8px}
+
+/* toolbox */
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.tool{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.tool .tq{color:var(--mute);font-size:14.5px}
+.tool h3{color:var(--navy)}
+.steps{display:flex;flex-direction:column;gap:5px;margin:0;padding:0;list-style:none}
+.steps li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:8px;font-size:14.5px}
+.steps li .n{font-family:var(--mono);font-size:12.5px;color:var(--onl);background:var(--teal);border-radius:5px;height:22px;display:flex;align-items:center;justify-content:center}
+.tbl{overflow-x:auto}
+.tbl table{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--mute);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+.tbl td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl td.w{font-family:var(--mono);color:var(--teal);white-space:nowrap}
+.canvas9{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.canvas9 div{border:1.5px solid var(--teal);border-radius:6px;padding:7px;font-size:13px;min-width:0}
+.canvas9 div b{display:block;font-size:13.5px;color:var(--navy)}
+.canvas9 div.k{background:var(--amber-bg)}
+@media (max-width:420px){.canvas9{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ideas */
+.ideas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 24px;counter-reset:i;margin:0;padding:0;list-style:none}
+@media (max-width:700px){.ideas{grid-template-columns:1fr}}
+.ideas li{display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;align-items:center;font-size:16.5px}
+.ideas li::before{counter-increment:i;content:counter(i);font-family:var(--display);font-size:24px;color:var(--onl);background:var(--teal);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center}
+
+/* glossary */
+.gsearch{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.gsearch input{flex:1 1 260px;font-family:var(--body);font-size:16px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);min-width:0}
+.gsearch .count{font-family:var(--mono);font-size:13px;color:var(--mute)}
+.gloss{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
+.term{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14.5px;min-width:0}
+.term b{display:block;color:var(--navy);font-size:15.5px}
+.term .s{font-family:var(--mono);font-size:11.5px;color:var(--mute)}
+
+/* sims */
+.sims{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:820px){.sims{grid-template-columns:1fr}}
+.sim{background:var(--navy);color:#fff;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .sim{background:var(--l1)}}
+:root[data-theme="dark"] .sim{background:var(--l1)}
+.sim h3{font-size:22px;color:#fff}
+.sim .s{font-family:var(--mono);font-size:12px;color:#ffd08a}
+.sim p{font-size:14.5px;color:#e6eef6}
+.sim .les{font-weight:600;color:#fff;font-style:italic}
+.sim a{color:#ffd08a;font-weight:600}
+.refs{font-size:14.5px;color:var(--ink);margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+footer{font-size:13px;color:var(--mute);text-align:center;border-top:1px solid var(--line);padding-top:16px}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+</style>
+
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <span class="eyebrow">Tecnologías Emergentes y Disruptivas · Maestría en Transformación Digital · UDLA</span>
+      <h1>Guía de la Materia</h1>
+      <p class="sub">Todo lo que vimos en 12 sesiones, en una página: las tecnologías, los marcos para decidir y las ideas que vale la pena recordar cuando llegue la próxima disrupción.</p>
+      <p class="meta">Prof. Juan David Velandia Gómez · Cierre de la materia</p>
+      <nav class="toc" aria-label="Contenido">
+        <a href="#unidades">Unidades</a><a href="#tecnologias">Tecnologías</a><a href="#herramientas">Herramientas</a><a href="#ideas">10 ideas</a><a href="#glosario">Glosario</a><a href="#simuladores">Simuladores</a><a href="#lecturas">Lecturas</a>
+      </nav>
+    </div>
+    <div>
+      <div class="stack" aria-label="Pila de habilitadores digitales">
+        <div class="layer" style="background:var(--l1)"><b>Experiencia</b><span>XR · metaverso</span><span class="r">ver, entrenar, guiar</span></div>
+        <div class="layer" style="background:var(--l2)"><b>Simulación</b><span>Gemelos digitales</span><span class="r">probar antes de actuar</span></div>
+        <div class="layer" style="background:var(--l3)"><b>Inteligencia</b><span>IA y analítica</span><span class="r">predecir y recomendar</span></div>
+        <div class="layer" style="background:var(--l2)"><b>Ejecución</b><span>RPA y automatización</span><span class="r">actuar en sistemas</span></div>
+        <div class="layer" style="background:var(--l3)"><b>Confianza</b><span>Blockchain</span><span class="r">verdad compartida</span></div>
+        <div class="layer" style="background:var(--l2)"><b>Datos</b><span>IoT</span><span class="r">sensar el mundo físico</span></div>
+        <div class="layer" style="background:var(--l1)"><b>Conectividad</b><span>5G y redes</span><span class="r">llevar el dato a tiempo</span></div>
+        <p class="cap">Ningún proyecto necesita todas las capas. El arte está en elegir cuáles, empezando por una decisión de negocio.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="unidades">
+    <span class="eyebrow">El recorrido</span>
+    <h2>Cuatro unidades, doce sesiones</h2>
+    <div class="units">
+      <div class="unit"><div class="uh">1 · Disrupción y criterio</div><ol>
+        <li><span class="n">S1</span><div><b>Panorama de la disrupción</b><span>Disruptiva no es nueva: cambia las reglas del mercado.</span></div></li>
+        <li><span class="n">S2</span><div><b>Evaluar tecnologías</b><span>Hype Cycle y TRL miden madurez; el caso de negocio decide.</span></div></li>
+        <li><span class="n">S3</span><div><b>Blockchain</b><span>Asegura que el dato no cambie, no que sea cierto.</span></div></li></ol></div>
+      <div class="unit"><div class="uh">2 · IoT y automatización</div><ol>
+        <li><span class="n">S4</span><div><b>IoT</b><span>Sensar, conectar, procesar y actuar, sin intervención humana.</span></div></li>
+        <li><span class="n">S5</span><div><b>RPA</b><span>Mejora el proceso y luego automatízalo; las excepciones mandan.</span></div></li>
+        <li><span class="n">S6</span><div><b>Convergencia IoT–RPA</b><span>El sensor detecta; el robot ejecuta.</span></div></li></ol></div>
+      <div class="unit"><div class="uh">3 · Gemelos y habilitadores</div><ol>
+        <li><span class="n">S7</span><div><b>Gemelos digitales</b><span>Modelo sincronizado con un activo real, en ambas direcciones.</span></div></li>
+        <li><span class="n">S8</span><div><b>Metaverso y XR</b><span>La interfaz humana de los datos y los gemelos.</span></div></li>
+        <li><span class="n">S9</span><div><b>Trazabilidad y monitoreo</b><span>Primero la decisión, después los datos, después la tecnología.</span></div></li></ol></div>
+      <div class="unit"><div class="uh">4 · Infraestructura y estrategia</div><ol>
+        <li><span class="n">S10</span><div><b>5G</b><span>eMBB, URLLC y mMTC: tres redes en una.</span></div></li>
+        <li><span class="n">S11</span><div><b>Integración estratégica</b><span>Hoja de ruta en tres horizontes, con sostenibilidad y cambio.</span></div></li>
+        <li><span class="n">S12</span><div><b>Proyectos y cierre</b><span>La tecnología como motor de transformación.</span></div></li></ol></div>
+    </div>
+  </section>
+
+  <section class="sec" id="tecnologias">
+    <span class="eyebrow">Ficha de cada tecnología</span>
+    <h2>Qué es, qué resuelve y cuándo no usarla</h2>
+    <div class="techs">
+      <article class="tech"><div class="th"><h3>Blockchain</h3><span class="ses">Sesión 3</span></div><dl>
+        <dt>Qué es</dt><dd>Registro distribuido e inmutable que comparten varios actores, con contratos inteligentes que ejecutan reglas SI / ENTONCES.</dd>
+        <dt>Resuelve</dt><dd>Confianza entre actores que no se conocen: trazabilidad de origen, certificaciones, pagos automáticos, tokenización de activos.</dd>
+        <dt>Cuándo no</dt><dd class="no">Un solo actor controla los datos, o el problema es la calidad del dato de entrada.</dd></dl>
+        <p class="quote">Garantiza que el dato no cambie, no que sea verdadero.</p>
+        <p class="num">Walmart: rastrear un mango pasó de 7 días a 2,2 s · TradeLens cerró por falta de adopción</p></article>
+      <article class="tech"><div class="th"><h3>Internet de las Cosas</h3><span class="ses">Sesión 4</span></div><dl>
+        <dt>Qué es</dt><dd>Objetos con sensores, conectividad y procesamiento que intercambian datos para monitorear y actuar sobre el mundo físico.</dd>
+        <dt>Resuelve</dt><dd>Visibilidad en tiempo real: cadena de frío, mantenimiento predictivo, flotas, calidad de aire y agua.</dd>
+        <dt>Cuándo no</dt><dd class="no">No hay una decisión que dependa del dato, o nadie va a actuar sobre la alerta.</dd></dl>
+        <p class="quote">Un dispositivo solo conectado no es IoT: hay que cerrar el ciclo hasta la acción.</p>
+        <p class="num">21.100 M dispositivos en 2025 → 39.000 M en 2030 (IoT Analytics)</p></article>
+      <article class="tech"><div class="th"><h3>RPA</h3><span class="ses">Sesión 5</span></div><dl>
+        <dt>Qué es</dt><dd>Robots de software que imitan las acciones de una persona frente a la pantalla, siguiendo reglas.</dd>
+        <dt>Resuelve</dt><dd>Tareas repetitivas de alto volumen entre sistemas sin API: facturas, conciliaciones, recordatorios.</dd>
+        <dt>Cuándo no</dt><dd class="no">Hay una API estable, el proceso cambia seguido o la mayoría de casos son excepciones.</dd></dl>
+        <p class="quote">Si hay una API estable, úsala. RPA es el puente cuando no la hay.</p>
+        <p class="num">Líderes en el Magic Quadrant de RPA 2025 de Gartner: UiPath, Automation Anywhere, SS&amp;C Blue Prism</p></article>
+      <article class="tech"><div class="th"><h3>IA e hiperautomatización</h3><span class="ses">Sesiones 5 y 6</span></div><dl>
+        <dt>Qué es</dt><dd>RPA + IA (documentos, lenguaje, predicción) + orquestación y minería de procesos, para automatizar procesos de punta a punta.</dd>
+        <dt>Resuelve</dt><dd>Lo que RPA sola no puede: documentos no estructurados, texto libre, decisiones con datos.</dd>
+        <dt>Cuándo no</dt><dd class="no">No hay umbral de confianza ni una persona que decida cuando la IA duda.</dd></dl>
+        <p class="quote">La tasa de excepciones define el valor; la IA amplía lo automatizable.</p>
+        <p class="num">Gartner: más del 40 % de los proyectos de IA agéntica se cancelará antes de fines de 2027</p></article>
+      <article class="tech"><div class="th"><h3>Convergencia IoT–RPA</h3><span class="ses">Sesión 6</span></div><dl>
+        <dt>Qué es</dt><dd>Arquitecturas donde un evento de IoT dispara un flujo automatizado: el sensor detecta y el robot ejecuta.</dd>
+        <dt>Resuelve</dt><dd>Cerrar la brecha entre la alerta y la acción: orden de mantenimiento, notificación y registro en el ERP sin intervención humana.</dd>
+        <dt>Cuándo no</dt><dd class="no">Las alertas no son confiables: automatizar falsas alarmas multiplica el ruido.</dd></dl>
+        <p class="quote">Datos (IoT) + acción (RPA) + criterio (IA): el valor está en la combinación.</p>
+        <p class="num">Caso de la tarea: FarmaExpress, cadena de frío de medicamentos</p></article>
+      <article class="tech"><div class="th"><h3>Gemelos digitales</h3><span class="ses">Sesión 7</span></div><dl>
+        <dt>Qué es</dt><dd>Un modelo de un activo, proceso o sistema que se sincroniza automáticamente con él en ambas direcciones.</dd>
+        <dt>Resuelve</dt><dd>Probar decisiones antes de ejecutarlas: mantenimiento, capacidad, operación portuaria, planificación urbana.</dd>
+        <dt>Cuándo no</dt><dd class="no">No hay una decisión cara de por medio, o basta con una sombra digital (monitoreo).</dd></dl>
+        <p class="quote">El mismo modelo con datos de diseño o con datos reales lleva a decisiones opuestas.</p>
+        <p class="num">Casos: BMW Debrecen · Puerto de Róterdam · Virtual Singapore</p></article>
+      <article class="tech"><div class="th"><h3>Metaverso y XR</h3><span class="ses">Sesión 8</span></div><dl>
+        <dt>Qué es</dt><dd>Realidad aumentada, virtual y mixta: experiencias que combinan o sustituyen el entorno físico con contenido digital.</dd>
+        <dt>Resuelve</dt><dd>Capacitación en entornos de riesgo, soporte remoto en operación, prueba de productos y experiencias de marca.</dd>
+        <dt>Cuándo no</dt><dd class="no">El costo de contenido y dispositivos supera el ahorro o la conversión que se puede medir.</dd></dl>
+        <p class="quote">XR es la interfaz humana de los datos: la forma de ver un gemelo o guiar a un técnico.</p>
+        <p class="num">AR superpone · VR sumerge · MR hace interactuar lo digital con lo físico · XR agrupa a las tres</p></article>
+      <article class="tech"><div class="th"><h3>Trazabilidad end-to-end</h3><span class="ses">Sesión 9</span></div><dl>
+        <dt>Qué es</dt><dd>Arquitectura digital adaptativa que integra habilitadores para seguir un producto o proceso de punta a punta y decidir con datos en tiempo real.</dd>
+        <dt>Resuelve</dt><dd>Cumplimiento regulatorio, confianza del cliente, retiro rápido de lotes y monitoreo inteligente de la operación.</dd>
+        <dt>Cuándo no</dt><dd class="no">Los actores no acordaron qué dato se registra, quién lo captura y quién lo ve.</dd></dl>
+        <p class="quote">La trazabilidad es un acuerdo entre actores; la tecnología lo vuelve verificable.</p>
+        <p class="num">IoT captura · blockchain da confianza · gemelo predice · XR presenta · IA y RPA ejecutan</p></article>
+      <article class="tech"><div class="th"><h3>5G</h3><span class="ses">Sesión 10</span></div><dl>
+        <dt>Qué es</dt><dd>La quinta generación de redes móviles, con tres familias de servicio: eMBB, URLLC y mMTC.</dd>
+        <dt>Resuelve</dt><dd>IoT masivo, control en tiempo real y XR móvil: ciudades inteligentes, manufactura 4.0, telemedicina.</dd>
+        <dt>Cuándo no</dt><dd class="no">WiFi, LoRaWAN o 4G ya cubren el alcance, la latencia y el volumen que la decisión necesita.</dd></dl>
+        <p class="quote">5G no es “4G más rápido”: es la red que habilita a las demás capas.</p>
+        <p class="num">Metas IMT-2020 (UIT): hasta 20 Gbit/s · latencia de 1 ms · 1 millón de dispositivos/km²</p></article>
+    </div>
+  </section>
+
+  <section class="sec" id="herramientas">
+    <span class="eyebrow">Caja de herramientas</span>
+    <h2>Marcos para decidir</h2>
+    <p class="lead">Las tecnologías cambian; estos marcos siguen sirviendo. Cada uno responde una pregunta concreta.</p>
+    <div class="tools">
+      <article class="tool"><h3>Hype Cycle de Gartner</h3><p class="tq">¿En qué momento de expectativas está la tecnología?</p>
+        <ol class="steps"><li><span class="n">1</span><span>Disparador de la innovación</span></li><li><span class="n">2</span><span>Pico de expectativas infladas</span></li><li><span class="n">3</span><span>Valle de la desilusión</span></li><li><span class="n">4</span><span>Pendiente de la iluminación</span></li><li><span class="n">5</span><span>Meseta de productividad</span></li></ol></article>
+      <article class="tool"><h3>Technology Readiness Level</h3><p class="tq">¿Qué tan madura es técnicamente?</p>
+        <ol class="steps"><li><span class="n">1–3</span><span>Principios básicos, concepto y prueba de concepto</span></li><li><span class="n">4–6</span><span>Validación en laboratorio y en entorno relevante</span></li><li><span class="n">7–9</span><span>Demostración operativa hasta sistema probado en operación real</span></li></ol>
+        <p class="tq">Mide madurez técnica, no valor para tu negocio.</p></article>
+      <article class="tool"><h3>Triángulo de conectividad IoT</h3><p class="tq">Alcance, batería y volumen de datos se contraponen: elige dos.</p>
+        <div class="tbl"><table><tr><th>Tecnología</th><th>Ideal para</th></tr><tr><td>WiFi</td><td>Plantas y oficinas con infraestructura</td></tr><tr><td>Bluetooth LE</td><td>Sensores cercanos y wearables</td></tr><tr><td>LoRaWAN</td><td>Kilómetros, a batería, pocos datos</td></tr><tr><td>NB-IoT / LTE-M</td><td>Activos dispersos con cobertura celular</td></tr><tr><td>4G / 5G</td><td>Video, flotas, baja latencia</td></tr></table></div></article>
+      <article class="tool"><h3>MQTT, CoAP, HTTP</h3><p class="tq">¿Quién lleva el dato?</p>
+        <div class="tbl"><table><tr><th>Protocolo</th><th>Úsalo para</th></tr><tr><td>MQTT</td><td>Telemetría de muchos dispositivos vía broker; tópicos, QoS, Last Will</td></tr><tr><td>HTTP / REST</td><td>Integrar la plataforma con ERP y sistemas empresariales</td></tr><tr><td>CoAP</td><td>Dispositivos con muy poca memoria y energía (sobre UDP)</td></tr></table></div></article>
+      <article class="tool"><h3>Matriz de priorización RPA</h3><p class="tq">¿Qué proceso automatizar primero? Califica de 1 a 5.</p>
+        <div class="tbl"><table><tr><th>Criterio</th><th>Peso</th></tr><tr><td>Basado en reglas</td><td class="w">20 %</td></tr><tr><td>Volumen y frecuencia</td><td class="w">20 %</td></tr><tr><td>Datos estructurados</td><td class="w">15 %</td></tr><tr><td>Proceso estable</td><td class="w">15 %</td></tr><tr><td>Pocas excepciones</td><td class="w">15 %</td></tr><tr><td>Impacto en calidad</td><td class="w">15 %</td></tr></table></div>
+        <p class="tq">Horas ahorradas = volumen × minutos ÷ 60 × (1 − % excepciones). Puntaje alto no es lo mismo que buen retorno.</p></article>
+      <article class="tool"><h3>ECRS</h3><p class="tq">Antes de automatizar, mejora el proceso.</p>
+        <ol class="steps"><li><span class="n">E</span><span><b>Eliminar</b> pasos que no agregan valor</span></li><li><span class="n">C</span><span><b>Combinar</b> aprobaciones o tareas</span></li><li><span class="n">R</span><span><b>Reorganizar</b> el orden para evitar reprocesos</span></li><li><span class="n">S</span><span><b>Simplificar</b> y estandarizar los formatos de entrada</span></li></ol></article>
+      <article class="tool"><h3>Modelo, sombra o gemelo</h3><p class="tq">Lo define el flujo de datos (Kritzinger et al., 2018).</p>
+        <div class="tbl"><table><tr><th></th><th>Físico → digital</th><th>Digital → físico</th></tr><tr><td><b>Modelo</b></td><td>Manual</td><td>Manual</td></tr><tr><td><b>Sombra</b></td><td>Automático</td><td>Manual</td></tr><tr><td><b>Gemelo</b></td><td>Automático</td><td>Automático</td></tr></table></div></article>
+      <article class="tool"><h3>Cinco preguntas antes de un gemelo</h3><p class="tq">Sirven también para cualquier inversión tecnológica.</p>
+        <ol class="steps"><li><span class="n">1</span><span>¿Qué decisión mejora?</span></li><li><span class="n">2</span><span>¿Los datos existen y son confiables?</span></li><li><span class="n">3</span><span>¿Cuánto vale equivocarse?</span></li><li><span class="n">4</span><span>¿Quién lo mantiene vivo?</span></li><li><span class="n">5</span><span>¿Basta con una sombra digital?</span></li></ol></article>
+      <article class="tool"><h3>Digital Twin Canvas</h3><p class="tq">Diseño conceptual en nueve bloques. Empieza siempre por el 1.</p>
+        <div class="canvas9"><div class="k"><b>1 Decisión</b>que mejora</div><div><b>2 Activo</b>o proceso</div><div><b>3 Usuarios</b>y frecuencia</div><div><b>4 Datos</b>y sensores</div><div><b>5 Sincronización</b>y latencia</div><div><b>6 Modelo</b>física, datos, híbrido</div><div><b>7 What-if</b>que habilita</div><div><b>8 Retorno</b>al físico</div><div><b>9 Valor</b>KPI y riesgos</div></div></article>
+      <article class="tool"><h3>Edge, fog o cloud</h3><p class="tq">La decisión define la latencia; la latencia define la arquitectura.</p>
+        <div class="tbl"><table><tr><th>Dónde</th><th>Latencia</th><th>Para</th></tr><tr><td>Edge</td><td class="w">ms</td><td>Control y acción inmediata, sin depender de la red</td></tr><tr><td>Fog / gateway</td><td class="w">decenas de ms</td><td>Agregar sensores, traducir, almacenar si cae la red</td></tr><tr><td>Cloud</td><td class="w">segundos</td><td>Históricos, IA entre sitios, integración con ERP</td></tr></table></div></article>
+      <article class="tool"><h3>5G en tres familias</h3><p class="tq">Cada caso de uso prioriza una.</p>
+        <div class="tbl"><table><tr><th>Familia</th><th>Prioriza</th><th>Ejemplo</th></tr><tr><td><b>eMBB</b></td><td>Velocidad</td><td>Video, XR móvil</td></tr><tr><td><b>URLLC</b></td><td>Latencia y confiabilidad</td><td>Control industrial, telemedicina</td></tr><tr><td><b>mMTC</b></td><td>Densidad de dispositivos</td><td>Medidores, ciudades</td></tr></table></div></article>
+      <article class="tool"><h3>Hoja de ruta en tres horizontes</h3><p class="tq">Qué hacer ahora, qué escalar y qué explorar.</p>
+        <ol class="steps"><li><span class="n">H1</span><span><b>Optimizar el núcleo</b> con pilotos medibles</span></li><li><span class="n">H2</span><span><b>Escalar</b> lo que funcionó</span></li><li><span class="n">H3</span><span><b>Explorar</b> lo emergente con apuestas pequeñas</span></li></ol>
+        <p class="tq">Cada iniciativa con dueño, indicador de éxito y criterio para detenerla.</p></article>
+    </div>
+  </section>
+
+  <section class="sec" id="ideas">
+    <span class="eyebrow">Para llevarse</span>
+    <h2>Diez ideas</h2>
+    <ol class="ideas">
+      <li>Empieza por el problema de negocio, nunca por la tecnología.</li>
+      <li>Madurez no es valor: usa Hype Cycle y TRL, pero decide por el caso de negocio.</li>
+      <li>Blockchain asegura que el dato no cambie, no que sea cierto.</li>
+      <li>IoT cierra un ciclo: sensar, conectar, procesar y actuar.</li>
+      <li>La decisión define la latencia; la latencia define la arquitectura.</li>
+      <li>Mejora el proceso antes de automatizarlo.</li>
+      <li>La tasa de excepciones define el valor de un robot.</li>
+      <li>Un gemelo es un modelo sincronizado con un activo real, no un 3D bonito.</li>
+      <li>Ninguna tecnología sola transforma: el valor está en la convergencia.</li>
+      <li>La transformación es de personas: patrocinio, capacidades y cambio cultural.</li>
+    </ol>
+  </section>
+
+  <section class="sec" id="glosario">
+    <span class="eyebrow">Glosario</span>
+    <h2>Los términos de la materia</h2>
+    <div class="gsearch"><input type="search" id="gq" placeholder="Buscar un término, por ejemplo «edge» o «token»" aria-label="Buscar en el glosario"><span class="count" id="gcount"></span></div>
+    <div class="gloss" id="gloss"></div>
+  </section>
+
+  <section class="sec" id="simuladores">
+    <span class="eyebrow">Lo que vivimos</span>
+    <h2>Tres simuladores, tres lecciones</h2>
+    <div class="sims">
+      <article class="sim"><span class="s">Sesión 4 · presencial</span><h3>Planta Virtual</h3><p>Sus celulares fueron sensores industriales que publicaban por MQTT a un dashboard en vivo, con reglas, alarmas y retos relámpago.</p><p class="les">El dato viaja, pero sin seguridad cualquiera lo lee.</p></article>
+      <article class="sim"><span class="s">Sesión 5 · virtual</span><h3>Sé el Robot</h3><p>Registrar facturas a mano contra reloj, y luego verlo hacer a un robot RPA y a un robot con IA de documentos.</p><p class="les">Las excepciones definen el valor de la automatización.</p><a href="https://claude.ai/artifact/JGkhEojv5BU684LypzPxaD" target="_blank" rel="noopener">Abrir el simulador</a></article>
+      <article class="sim"><span class="s">Sesión 7 · virtual</span><h3>Gemelo de Planta</h3><p>Planificar una semana de una enlatadora de atún en Manta con la ficha del fabricante, con un gemelo calibrado y con un optimizador.</p><p class="les">El mismo modelo con datos reales cambia la decisión.</p><a href="https://claude.ai/artifact/6rq14FYF2UhqsSVZ2niHFz" target="_blank" rel="noopener">Abrir el simulador</a></article>
+    </div>
+  </section>
+
+  <section class="sec" id="lecturas">
+    <span class="eyebrow">Para profundizar</span>
+    <h2>Lecturas clave</h2>
+    <ul class="refs">
+      <li>Christensen, C. M. (1997). <i>The innovator’s dilemma</i>. Harvard Business School Press.</li>
+      <li>Raj, P. y Raman, A. C. (2017). <i>The Internet of Things: Enabling technologies, platforms, and use cases</i>. CRC Press.</li>
+      <li>McKinsey &amp; Company (2021). <i>IoT value set to accelerate through 2030: Where and how to capture it</i>.</li>
+      <li>Aguirre, S. y Rodríguez, A. (2017). Automation of a business process using Robotic Process Automation (RPA): A case study. Springer.</li>
+      <li>Grieves, M. y Vickers, J. (2017). Digital twin: Mitigating unpredictable, undesirable emergent behavior in complex systems. Springer.</li>
+      <li>Kritzinger, W. et al. (2018). Digital twin in manufacturing: A categorical literature review and classification. <i>IFAC-PapersOnLine, 51</i>(11), 1016–1022.</li>
+      <li>Gartner (2025). Gartner predicts over 40% of agentic AI projects will be canceled by end of 2027.</li>
+      <li>IoT Analytics (2025). State of IoT 2025: Number of connected IoT devices growing 14% to 21.1 billion globally.</li>
+    </ul>
+  </section>
+
+  <footer>Tecnologías Emergentes y Disruptivas · Maestría en Transformación Digital · UDLA Ecuador · Prof. Juan David Velandia Gómez</footer>
+</div>
+
+<script>
+(function(){
+  var G=[
+    ["Agente de IA","Sistema de IA que planifica pasos y usa herramientas (incluidos robots RPA) para cumplir un objetivo.","S5"],
+    ["Atendido / desatendido","Robot RPA que trabaja junto a una persona en su computador, o solo en un servidor, por calendario o evento.","S5"],
+    ["Blockchain","Registro distribuido e inmutable compartido por varios actores.","S3"],
+    ["Broker MQTT","Intermediario que recibe mensajes publicados en tópicos y los entrega a quienes están suscritos.","S4"],
+    ["CoAP","Protocolo liviano tipo REST sobre UDP para dispositivos muy restringidos.","S4"],
+    ["Disrupción","Innovación que entra por un nicho y termina cambiando las reglas de un mercado.","S1"],
+    ["ECRS","Eliminar, Combinar, Reorganizar, Simplificar: mejorar el proceso antes de automatizarlo.","S5"],
+    ["Edge computing","Procesar los datos en el dispositivo o cerca de él, para decidir rápido y sin depender de la red.","S4"],
+    ["eMBB","Banda ancha móvil mejorada de 5G: máxima velocidad de datos.","S10"],
+    ["Gemelo digital","Modelo sincronizado automáticamente en ambas direcciones con un activo, proceso o sistema real.","S7"],
+    ["Human-in-the-loop","Diseño en el que una persona decide cuando la IA no alcanza el umbral de confianza.","S5"],
+    ["Hype Cycle","Modelo de Gartner de cinco fases sobre las expectativas que genera una tecnología.","S2"],
+    ["Hiperautomatización","Enfoque para automatizar todos los procesos posibles combinando RPA, IA, minería de procesos y orquestación.","S5"],
+    ["IDP","Procesamiento inteligente de documentos: IA que extrae campos de PDF, escaneos y correos.","S5"],
+    ["Last Will (MQTT)","Mensaje que el broker publica si un dispositivo se desconecta sin avisar.","S4"],
+    ["LoRaWAN","Red de largo alcance y bajo consumo para sensores a batería con pocos datos.","S4"],
+    ["mMTC","Comunicaciones masivas tipo máquina de 5G: muchísimos dispositivos por km².","S10"],
+    ["Oráculo","Servicio que lleva datos del mundo real a una blockchain para que un smart contract los use.","S3"],
+    ["Process mining","Reconstrucción del proceso real a partir de los registros de los sistemas.","S5"],
+    ["Realidad aumentada (AR)","Capa de información digital superpuesta al mundo real.","S8"],
+    ["Realidad mixta (MR)","Objetos digitales que reconocen y responden al espacio físico.","S8"],
+    ["Realidad virtual (VR)","Inmersión total en un entorno digital.","S8"],
+    ["RPA","Robots de software que imitan las acciones de una persona frente a la pantalla.","S5"],
+    ["Smart contract","Programa en una blockchain que ejecuta una regla SI / ENTONCES automáticamente.","S3"],
+    ["Sombra digital","Réplica que recibe datos automáticos del activo, pero cuyas decisiones vuelven a mano.","S7"],
+    ["Tokenización","Representar un activo real (inmueble, lote de producto) como tokens digitales, a menudo fraccionables.","S3"],
+    ["Trazabilidad end-to-end","Capacidad de seguir un producto o proceso desde el origen hasta el destino final.","S9"],
+    ["TRL","Technology Readiness Level: escala de 1 a 9 de madurez técnica.","S2"],
+    ["URLLC","Comunicaciones ultraconfiables de baja latencia de 5G, hasta 1 ms.","S10"],
+    ["XR","Realidad extendida: término que agrupa AR, VR y MR.","S8"]
+  ];
+  var box=document.getElementById("gloss"), q=document.getElementById("gq"), cnt=document.getElementById("gcount");
+  function norm(s){ return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,""); }
+  function render(){
+    var f=norm(q.value.trim()), list=G.filter(function(g){ return !f || norm(g[0]+" "+g[1]).indexOf(f)>=0; });
+    box.innerHTML=list.map(function(g){ return '<div class="term"><b>'+g[0]+'</b>'+g[1]+' <span class="s">· '+g[2]+'</span></div>'; }).join("") || '<div class="term">No hay términos que coincidan. Prueba con otra palabra.</div>';
+    cnt.textContent=list.length+" de "+G.length+" términos";
+  }
+  q.addEventListener("input",render); render();
+})();
+</script>
+</body></html>

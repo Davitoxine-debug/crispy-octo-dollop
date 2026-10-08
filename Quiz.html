@@ -1,0 +1,223 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>
+<title>Quiz Final · Tecnologías Emergentes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: single focused question card, progress rail on top, results board at the end */
+:root{
+  --bg:#eef2f5; --panel:#ffffff; --panel2:#f3f6f9; --line:#d4dce5; --ink:#18202e; --mute:#5b687b;
+  --navy:#21295C; --teal:#0b6e8a; --sea:#1e9bb8; --amber:#c8811a; --amber-bg:#fcf1de;
+  --ok:#1d7a4c; --ok-bg:#e3f3ea; --bad:#b83a32; --bad-bg:#fbe8e6;
+  --u1:#1C7293; --u2:#065A82; --u3:#21295C; --u4:#3A8FB7; --onu:#ffffff;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Barlow",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1421; --panel:#141d2e; --panel2:#1a2539; --line:#2a3852; --ink:#e7edf6; --mute:#98a6bd;
+  --navy:#a9bbff; --teal:#47b6d4; --sea:#5fd0ea; --amber:#f0b04c; --amber-bg:#3a2d16;
+  --ok:#4fcc8e; --ok-bg:#15352a; --bad:#ff7d72; --bad-bg:#3e1c1b;
+  --u1:#47b6d4; --u2:#5fa8ff; --u3:#a9bbff; --u4:#7fd6e8; --onu:#0d1421; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1421; --panel:#141d2e; --panel2:#1a2539; --line:#2a3852; --ink:#e7edf6; --mute:#98a6bd;
+  --navy:#a9bbff; --teal:#47b6d4; --sea:#5fd0ea; --amber:#f0b04c; --amber-bg:#3a2d16;
+  --ok:#4fcc8e; --ok-bg:#15352a; --bad:#ff7d72; --bad-bg:#3e1c1b;
+  --u1:#47b6d4; --u2:#5fa8ff; --u3:#a9bbff; --u4:#7fd6e8; --onu:#0d1421; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;margin:0}
+.wrap{max-width:820px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
+button{font-family:var(--body);cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:600}
+header h1{font-size:40px;color:var(--navy);line-height:1}
+header p{margin:6px 0 0;color:var(--mute);max-width:60ch}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+.units{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.units{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.unit{border-radius:10px;padding:10px 12px;color:var(--onu);min-width:0}
+.unit b{display:block;font-family:var(--display);font-size:18px}
+.unit span{font-size:13px;opacity:.92}
+.u1{background:var(--u1)} .u2{background:var(--u2)} .u3{background:var(--u3)} .u4{background:var(--u4)}
+.start{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-top:14px}
+.start label{display:flex;flex-direction:column;gap:4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);font-weight:600;flex:1 1 220px}
+.start input[type=text]{font-family:var(--body);font-size:16px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--ink)}
+.check{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink)}
+.btn{border:0;border-radius:9px;padding:12px 18px;font-weight:700;font-size:16px;background:var(--teal);color:var(--onu)}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--teal);border:1.5px solid var(--teal)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;filter:none}
+
+.rail{display:flex;gap:4px}
+.rail i{flex:1;height:8px;border-radius:4px;background:var(--line)}
+.rail i.ok{background:var(--ok)} .rail i.bad{background:var(--bad)} .rail i.cur{background:var(--sea)}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.chip{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:99px;color:var(--onu)}
+.qnum{font-family:var(--mono);font-size:14px;color:var(--mute)}
+.qtext{font-size:22px;font-weight:600;margin:12px 0 14px;line-height:1.3}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;align-items:center;text-align:left;background:var(--panel2);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;font-size:16px;color:var(--ink)}
+.opt:hover:not([disabled]){border-color:var(--sea)}
+.opt .k{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;background:var(--panel);border:1px solid var(--line)}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg)} .opt.ok .k{background:var(--ok);color:#fff;border-color:var(--ok)}
+.opt.bad{border-color:var(--bad);background:var(--bad-bg)} .opt.bad .k{background:var(--bad);color:#fff;border-color:var(--bad)}
+.opt[disabled]{cursor:default}
+.fb{margin-top:14px;border-radius:10px;padding:12px 14px;font-size:15px}
+.fb.ok{background:var(--ok-bg)} .fb.bad{background:var(--bad-bg)}
+.fb b{display:block;font-family:var(--display);font-size:18px;margin-bottom:2px}
+.fb.ok b{color:var(--ok)} .fb.bad b{color:var(--bad)}
+.fb .ses{font-size:12.5px;color:var(--mute);margin-top:6px}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px}
+.hint{font-size:13px;color:var(--mute)}
+
+.score{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.score .big{font-family:var(--display);font-size:72px;color:var(--navy);line-height:1}
+.score .of{font-family:var(--mono);font-size:20px;color:var(--mute)}
+.verdict{font-size:18px;font-weight:600;margin-top:4px}
+.bars{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.bar{display:grid;grid-template-columns:150px minmax(0,1fr) 56px;gap:10px;align-items:center;font-size:14px}
+@media (max-width:520px){.bar{grid-template-columns:110px minmax(0,1fr) 48px}}
+.bar .track{height:14px;border-radius:7px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
+.bar .fill{height:100%;border-radius:7px}
+.bar .v{font-family:var(--mono);text-align:right}
+.miss{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.miss div{background:var(--panel2);border-radius:8px;padding:10px 12px;font-size:14.5px}
+.miss b{color:var(--ok)}
+.share{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.share textarea{flex:1 1 280px;min-width:0;height:60px;font-family:var(--mono);font-size:12.5px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical}
+.foot{font-size:13px;color:var(--mute);text-align:center}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Tecnologías Emergentes y Disruptivas · Maestría en Transformación Digital · UDLA</span>
+    <h1>Quiz Final</h1>
+    <p>Veinte preguntas sobre las cuatro unidades de la materia. Cada respuesta trae su explicación y la sesión donde lo vimos. Al final verás tu puntaje por unidad.</p>
+  </header>
+
+  <section class="card" id="intro">
+    <div class="units">
+      <div class="unit u1"><b>Unidad 1</b><span>Disrupción, evaluación y blockchain · 5 preguntas</span></div>
+      <div class="unit u2"><b>Unidad 2</b><span>IoT, RPA y convergencia · 6 preguntas</span></div>
+      <div class="unit u3"><b>Unidad 3</b><span>Gemelos, XR y trazabilidad · 5 preguntas</span></div>
+      <div class="unit u4"><b>Unidad 4</b><span>5G y estrategia · 4 preguntas</span></div>
+    </div>
+    <div class="start">
+      <label for="name">Tu nombre (para el resultado)<input type="text" id="name" maxlength="40" placeholder="Ej.: Ana Pérez" autocomplete="off"></label>
+      <label class="check" style="flex:0 0 auto;text-transform:none;letter-spacing:0;font-size:14px;font-weight:500"><input type="checkbox" id="shuffle"> Mezclar el orden de las preguntas</label>
+      <button class="btn" id="startBtn">Empezar</button>
+    </div>
+    <p class="hint" style="margin:12px 0 0">Atajos: teclas 1 a 4 para responder, Enter para seguir.</p>
+  </section>
+
+  <section class="card" id="quiz" hidden>
+    <div class="rail" id="rail" aria-hidden="true"></div>
+    <div class="qhead" style="margin-top:14px"><span class="chip" id="chip"></span><span class="qnum" id="qnum"></span></div>
+    <div class="qtext" id="qtext"></div>
+    <div class="opts" id="opts" role="group" aria-label="Opciones de respuesta"></div>
+    <div id="fb" aria-live="polite"></div>
+    <div class="nav"><span class="hint" id="running"></span><button class="btn" id="nextBtn" hidden>Siguiente</button></div>
+  </section>
+
+  <section class="card" id="result" hidden>
+    <span class="eyebrow" id="resName">Resultado</span>
+    <div class="score"><span class="big" id="big">0</span><span class="of">/ 20</span></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="bars" id="bars"></div>
+    <h3 style="font-size:20px;margin-top:20px" id="missTitle">Para repasar</h3>
+    <div class="miss" id="miss"></div>
+    <div class="share"><textarea id="shareTxt" readonly aria-label="Resultado para compartir"></textarea><button class="btn ghost" id="copy">Copiar para el chat</button></div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn" id="again">Volver a intentar</button></div>
+  </section>
+
+  <p class="foot">Prof. Juan David Velandia Gómez · Sesión 12 · Cierre de la materia</p>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var UNITS={1:"Unidad 1 · Disrupción y blockchain",2:"Unidad 2 · IoT y automatización",3:"Unidad 3 · Gemelos, XR y trazabilidad",4:"Unidad 4 · 5G y estrategia"};
+  var Q=[
+    {u:1,s:"Sesión 1",q:"¿Qué distingue a una innovación disruptiva de una incremental?",o:["Usa una tecnología más avanzada que la existente","Empieza en un nicho, muchas veces con menor desempeño, y termina cambiando las reglas del mercado","Siempre la lanza una empresa líder del sector","Requiere inteligencia artificial para funcionar"],a:1,e:"Según Christensen, la innovación disruptiva entra por un nicho desatendido o con una propuesta “peor pero suficiente”, y desde ahí desplaza a los líderes. La incremental mejora lo existente para los mismos clientes."},
+    {u:1,s:"Sesión 2",q:"En el Hype Cycle de Gartner, ¿qué fase viene inmediatamente después del pico de expectativas infladas?",o:["Meseta de productividad","Valle de la desilusión","Pendiente de la iluminación","Disparador de la innovación"],a:1,e:"La secuencia es: disparador → pico de expectativas infladas → valle de la desilusión → pendiente de la iluminación → meseta de productividad."},
+    {u:1,s:"Sesión 2",q:"Una tecnología tiene TRL 9. ¿Qué significa?",o:["Que tiene el máximo valor de negocio garantizado","Que el sistema ya fue probado en operación real","Que está en investigación básica","Que está en el pico de expectativas"],a:1,e:"La escala TRL va de 1 (principio científico observado) a 9 (sistema probado en un entorno operativo real). Mide madurez técnica, no valor para tu negocio."},
+    {u:1,s:"Sesión 3",q:"En una cadena de trazabilidad, ¿qué NO garantiza blockchain por sí sola?",o:["Que el registro no se pueda alterar","Que todos los actores vean la misma versión de los datos","Que el dato registrado sea verdadero","Que exista un historial completo de transacciones"],a:2,e:"Blockchain asegura que lo registrado no cambie, no que sea cierto: “basura entra, basura sale”. Por eso necesita IoT y oráculos para capturar datos confiables."},
+    {u:1,s:"Sesión 3",q:"TradeLens, la plataforma blockchain de Maersk e IBM para comercio marítimo, cerró principalmente por…",o:["Fallas técnicas de la blockchain","Falta de adopción por parte de la industria, incluidos los competidores","Una regulación que la prohibió","El alto consumo de energía"],a:1,e:"La tecnología funcionaba; el ecosistema no se sumó. En blockchain para cadenas de suministro, la gobernanza y la adopción pesan más que la tecnología."},
+    {u:2,s:"Sesión 4",q:"Un técnico anota la temperatura de la cámara fría en Excel cada 2 horas. ¿Es una solución IoT?",o:["Sí, porque los datos quedan en formato digital","No, porque la captura y la transmisión dependen de una persona","Sí, si el Excel está en la nube","Sí, si el termómetro es digital"],a:1,e:"IoT cierra el ciclo sensar → conectar → procesar → actuar sin intervención humana. Aquí la “conexión” es una persona: es el antes de IoT."},
+    {u:2,s:"Sesión 4",q:"Una camaronera necesita medir oxígeno en piscinas a 2 km del galpón, sin energía en cada punto y con pocos datos por lectura. ¿Qué conectividad encaja mejor?",o:["WiFi","LoRaWAN","4G con video","Bluetooth"],a:1,e:"Triángulo de conectividad: largo alcance + batería de larga duración, sacrificando volumen de datos. Eso es LoRaWAN (de 2 a 15 km, muy bajo consumo)."},
+    {u:2,s:"Sesión 4",q:"En el laboratorio Planta Virtual, ¿qué mecanismo de MQTT avisó al dashboard que un celular se había desconectado?",o:["QoS 2","Mensaje retenido (retained)","Last Will","El comodín #"],a:2,e:"El Last Will es un mensaje que el broker publica en nombre del dispositivo si este desaparece sin despedirse. Así el dashboard marcó OFFLINE al poner un celular en modo avión."},
+    {u:2,s:"Sesión 5",q:"Todos los días se copian pedidos desde el portal B2B de un supermercado, que no tiene API, al ERP. ¿Qué conviene?",o:["RPA","Integración por API","Rediseñar el proceso primero","Blockchain"],a:0,e:"Reglas claras, volumen y ausencia de API: el caso típico de RPA. Si existiera una API estable, sería la mejor opción."},
+    {u:2,s:"Sesión 5",q:"¿Qué significa aplicar ECRS antes de automatizar?",o:["Evaluar, Calcular, Robotizar, Supervisar","Eliminar, Combinar, Reorganizar, Simplificar","Escalar, Conectar, Replicar, Sostener","Estandarizar, Controlar, Revisar, Seguir"],a:1,e:"Automatizar un proceso ineficiente multiplica la ineficiencia. Primero se mejora el proceso y después se automatiza."},
+    {u:2,s:"Sesión 5",q:"En “Sé el Robot”, ¿por qué el robot RPA envió 4 de las 12 facturas a una persona?",o:["Porque eran de montos altos","Porque eran documentos no estructurados: escaneos y correos","Porque el robot se quedó sin licencia","Porque superaban la regla del 2 %"],a:1,e:"RPA puro solo lee campos estructurados. La tasa de excepciones define el valor real de la automatización; con IA de documentos, el robot pudo leer escaneos y correos."},
+    {u:3,s:"Sesión 7",q:"Un dashboard refleja en tiempo real el estado de una máquina, pero las decisiones se toman a mano. ¿Qué es, según la clasificación de Kritzinger et al.?",o:["Un modelo digital","Una sombra digital","Un gemelo digital","Un metaverso industrial"],a:1,e:"Sombra digital: los datos fluyen solos del físico al digital, pero no de vuelta. En el gemelo, el flujo es automático en ambas direcciones."},
+    {u:3,s:"Sesión 7",q:"En “Gemelo de Planta”, ¿por qué falló el plan basado en la simulación tradicional?",o:["El modelo de desgaste estaba mal programado","Usaba datos de diseño: 20 % de desgaste, cuando la cerradora real estaba en 46 %","Los sensores de vibración estaban averiados","La velocidad elegida era demasiado baja"],a:1,e:"El modelo era el mismo; lo que cambió fueron los datos. El gemelo, calibrado con 48 h de vibración, mostraba 87 % de probabilidad de falla con ese plan."},
+    {u:3,s:"Sesión 7",q:"¿Qué debería definir la frecuencia de sincronización de un gemelo digital?",o:["La tecnología más moderna disponible","La decisión que apoya y la latencia que esa decisión tolera","El proveedor de la plataforma","El costo de almacenamiento en la nube"],a:1,e:"Control en tiempo real: milisegundos. Operación: minutos u horas. Planificación: días. Sincronizar más rápido de lo necesario solo agrega costo."},
+    {u:3,s:"Sesión 8",q:"¿Qué distingue a la realidad mixta de la realidad aumentada?",o:["En la mixta, los objetos digitales interactúan con el entorno físico","La mixta es completamente virtual","La mixta no necesita ningún dispositivo","La mixta solo se usa en videojuegos"],a:0,e:"La realidad aumentada superpone información; la mixta ancla objetos digitales que reconocen y responden al espacio real. XR es el término paraguas que agrupa AR, VR y MR."},
+    {u:3,s:"Sesión 9",q:"En una arquitectura de trazabilidad end-to-end entre empresas que no se conocen, ¿qué habilitador aporta la confianza en el registro compartido?",o:["Realidad extendida","RPA","Blockchain","5G"],a:2,e:"Cada habilitador cumple un rol: IoT captura, blockchain asegura la confianza entre actores, el gemelo simula y predice, XR presenta, IA y RPA deciden y ejecutan."},
+    {u:4,s:"Sesión 10",q:"¿Qué familia de servicios 5G está pensada para IoT masivo, con hasta un millón de dispositivos por km²?",o:["eMBB","URLLC","mMTC","LTE-A"],a:2,e:"mMTC (comunicaciones masivas tipo máquina) prioriza densidad de conexiones y bajo consumo. eMBB prioriza velocidad; URLLC, latencia y confiabilidad."},
+    {u:4,s:"Sesión 10",q:"Un brazo robótico controlado a distancia en una planta necesita latencia mínima y máxima confiabilidad. ¿Qué capacidad de 5G se prioriza?",o:["eMBB","URLLC","mMTC","Ninguna; basta con WiFi doméstico"],a:1,e:"URLLC (ultraconfiable y de baja latencia) apunta a latencias de hasta 1 ms: control industrial, vehículos, telemedicina."},
+    {u:4,s:"Sesión 11",q:"¿Qué caracteriza a una buena hoja de ruta tecnológica?",o:["Incluye todas las tecnologías del Hype Cycle del año","Conecta cada iniciativa a un objetivo, con dueño, indicador de éxito y criterio para detenerla","La define el área de TI por su cuenta","Prioriza siempre la tecnología más nueva"],a:1,e:"Una hoja de ruta útil también dice qué NO se hará. Los tres horizontes ayudan: optimizar el núcleo, escalar lo que funciona y explorar lo emergente."},
+    {u:4,s:"Sesión 11",q:"Según lo visto en la materia, ¿cuál es la causa más frecuente de que una iniciativa de transformación digital no escale?",o:["La tecnología no está lista","Las personas y los procesos: patrocinio, capacidades y gestión del cambio","El costo del hardware","La falta de conectividad 5G"],a:1,e:"Lo vimos en IoT (el “purgatorio del piloto” de McKinsey), en RPA (liberar horas no es despedir) y en gemelos (¿quién lo mantiene vivo?). La transformación es de personas."}
+  ];
+  var order=[], perms=[], i=0, answers=[], locked=false;
+
+  function startQuiz(){
+    order=Q.map(function(_,k){return k;});
+    if($("shuffle").checked){ for(var k=order.length-1;k>0;k--){ var j=Math.floor(Math.random()*(k+1)); var t=order[k]; order[k]=order[j]; order[j]=t; } }
+    perms=order.map(function(){ var p=[0,1,2,3]; for(var k=3;k>0;k--){ var j=Math.floor(Math.random()*(k+1)); var t=p[k]; p[k]=p[j]; p[j]=t; } return p; });
+    i=0; answers=[]; $("intro").hidden=true; $("result").hidden=true; $("quiz").hidden=false; render();
+  }
+  function rail(){
+    $("rail").innerHTML=order.map(function(_,k){ var a=answers[k]; return '<i class="'+(a===undefined?(k===i?"cur":""):(a.ok?"ok":"bad"))+'"></i>'; }).join("");
+  }
+  function render(){
+    var q=Q[order[i]]; locked=false;
+    $("chip").textContent=UNITS[q.u]; $("chip").className="chip u"+q.u;
+    $("qnum").textContent="Pregunta "+(i+1)+" de "+order.length;
+    $("qtext").textContent=q.q;
+    var pm=perms[i]; $("opts").innerHTML=pm.map(function(orig,k){ return '<button class="opt" data-k="'+k+'"><span class="k">'+(k+1)+'</span><span>'+q.o[orig]+'</span></button>'; }).join("");
+    Array.prototype.forEach.call($("opts").children,function(b){ b.onclick=function(){ pick(+b.dataset.k); }; });
+    $("fb").innerHTML=""; $("nextBtn").hidden=true;
+    var ok=answers.filter(function(a){return a&&a.ok;}).length; $("running").textContent=answers.length?ok+" correctas de "+answers.length:"";
+    rail();
+  }
+  function pick(k){
+    if(locked) return; locked=true;
+    var q=Q[order[i]], pm=perms[i], ok=pm[k]===q.a; answers[i]={q:order[i],pick:pm[k],ok:ok};
+    Array.prototype.forEach.call($("opts").children,function(b){ var bk=+b.dataset.k; b.disabled=true; if(pm[bk]===q.a) b.classList.add("ok"); else if(bk===k) b.classList.add("bad"); });
+    $("fb").innerHTML='<div class="fb '+(ok?"ok":"bad")+'"><b>'+(ok?"Correcto":"No es esa")+'</b>'+q.e+'<div class="ses">Lo vimos en: '+q.s+'</div></div>';
+    $("nextBtn").hidden=false; $("nextBtn").textContent=i===order.length-1?"Ver resultado":"Siguiente"; $("nextBtn").focus();
+    var okN=answers.filter(function(a){return a&&a.ok;}).length; $("running").textContent=okN+" correctas de "+answers.length;
+    rail();
+  }
+  $("nextBtn").onclick=function(){ if(i<order.length-1){ i++; render(); } else finish(); };
+  document.addEventListener("keydown",function(e){
+    if($("quiz").hidden) return;
+    if(!locked && e.key>="1" && e.key<="4"){ pick(+e.key-1); }
+    else if(locked && e.key==="Enter" && document.activeElement!==$("nextBtn")){ $("nextBtn").click(); }
+  });
+
+  function finish(){
+    $("quiz").hidden=true; $("result").hidden=false;
+    var total=answers.filter(function(a){return a.ok;}).length, name=$("name").value.trim();
+    $("resName").textContent=name?("Resultado · "+name):"Resultado";
+    $("big").textContent=total;
+    $("verdict").textContent= total>=18?"Excelente: dominas la materia de punta a punta.": total>=14?"Muy bien: tienes el mapa completo, con un par de zonas para repasar.": total>=10?"Bien: revisa las unidades con menor puntaje en la guía resumen.":"Hay que repasar: la guía resumen te ayuda a ordenar los conceptos clave.";
+    var per={1:[0,0],2:[0,0],3:[0,0],4:[0,0]};
+    answers.forEach(function(a){ var u=Q[a.q].u; per[u][1]++; if(a.ok) per[u][0]++; });
+    $("bars").innerHTML=[1,2,3,4].map(function(u){ var p=per[u]; var pct=p[1]?p[0]/p[1]*100:0; return '<div class="bar"><span>'+UNITS[u].split(" · ")[0]+' <span style="color:var(--mute)">· '+UNITS[u].split(" · ")[1]+'</span></span><div class="track"><div class="fill u'+u+'" style="width:'+pct.toFixed(0)+'%"></div></div><span class="v">'+p[0]+'/'+p[1]+'</span></div>'; }).join("");
+    var miss=answers.filter(function(a){return !a.ok;});
+    $("missTitle").textContent=miss.length?"Para repasar ("+miss.length+")":"Sin errores. Nada que repasar.";
+    $("miss").innerHTML=miss.map(function(a){ var q=Q[a.q]; return '<div>'+q.q+'<br>Respuesta: <b>'+q.o[q.a]+'</b> <span style="color:var(--mute)">· '+q.s+'</span></div>'; }).join("");
+    $("shareTxt").value="Quiz final TED"+(name?" · "+name:"")+": "+total+"/20 · U1 "+per[1][0]+"/"+per[1][1]+" · U2 "+per[2][0]+"/"+per[2][1]+" · U3 "+per[3][0]+"/"+per[3][1]+" · U4 "+per[4][0]+"/"+per[4][1];
+  }
+  $("copy").onclick=function(){ var b=this, t=$("shareTxt").value; var done=function(){ b.textContent="Copiado"; setTimeout(function(){b.textContent="Copiar para el chat";},1500); };
+    try{ navigator.clipboard.writeText(t).then(done,function(){ $("shareTxt").select(); b.textContent="Selecciona y copia"; }); }catch(e){ $("shareTxt").select(); b.textContent="Selecciona y copia"; } };
+  $("again").onclick=function(){ $("result").hidden=true; $("intro").hidden=false; window.scrollTo(0,0); };
+  $("startBtn").onclick=startQuiz;
+  window.__quiz={Q:Q};
+})();
+</script>
+</body></html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agenda QOR 2026 Q4 · Ecuador</title>
+<style>
+:root{--navy:#0b2545;--ink:#1f2937;--mut:#6b7280;--bg:#f4f6fa;--card:#fff;--d1:#5b6b73;--d2:#2f6fd6;--d3:#3f8a3a;--gold:#c99a2e;--r:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45;-webkit-font-smoothing:antialiased}
+header{background:linear-gradient(135deg,#0b2545 0%,#13315c 55%,#1d4e89 100%);color:#fff;padding:calc(28px + env(safe-area-inset-top)) 20px 40px;text-align:center;position:relative;overflow:hidden}
+.flag{display:inline-flex;height:6px;width:90px;border-radius:3px;overflow:hidden;margin-bottom:14px}
+.flag i{flex:2;background:#ffd100}.flag i+i{flex:1;background:#0033a0}.flag i+i+i{background:#ef3340}
+.kicker{letter-spacing:.18em;text-transform:uppercase;font-size:.75rem;opacity:.8}
+h1{font-size:clamp(1.8rem,5vw,3rem);font-weight:800;margin:.3rem 0}
+.sub{opacity:.85;font-size:.95rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
+.chip{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);padding:6px 12px;border-radius:999px;font-size:.8rem}
+nav{position:sticky;top:0;z-index:10;background:rgba(244,246,250,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:10px 12px;display:flex;gap:8px;justify-content:center;border-bottom:1px solid #e5e7eb}
+nav a{text-decoration:none;color:#fff;font-weight:600;font-size:.85rem;padding:8px 14px;border-radius:999px;white-space:nowrap}
+nav a.n1{background:var(--d1)}nav a.n2{background:var(--d2)}nav a.n3{background:var(--d3)}
+main{max-width:1250px;margin:24px auto 0;padding:0 14px 40px;position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:start}
+.day{background:var(--card);border-radius:var(--r);box-shadow:0 6px 24px rgba(11,37,69,.08);overflow:hidden;scroll-margin-top:80px}
+.dh{padding:18px 20px;color:#fff}
+.day.d1 .dh{background:var(--d1)}.day.d2 .dh{background:var(--d2)}.day.d3 .dh{background:var(--d3)}
+.dh small{text-transform:uppercase;letter-spacing:.12em;font-size:.7rem;opacity:.85}
+.dh h2{font-size:1.35rem;margin-top:2px}
+.dh p{font-size:.85rem;opacity:.9}
+.tl{padding:16px 18px 20px;position:relative}
+.it{position:relative;padding:0 0 16px 22px;border-left:2px solid #e5e7eb;margin-left:6px}
+.it:last-child{padding-bottom:0}
+.it:before{content:"";position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--c)}
+.d1{--c:var(--d1)}.d2{--c:var(--d2)}.d3{--c:var(--d3)}
+.t{font-size:.78rem;font-weight:700;color:var(--c);letter-spacing:.02em}
+.ti{font-weight:700;font-size:1rem;margin-top:2px}
+.ds{font-size:.85rem;color:var(--mut);margin-top:4px}
+.ds ol{padding-left:18px}
+.tag{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:6px;background:#eef2ff;color:#3730a3;margin-top:6px}
+.it.meal .ti:before{content:"🍽️ "}
+.it.dinner{background:linear-gradient(135deg,#1a1a1a,#3a2a12);color:#fff;border:none;border-radius:14px;padding:16px;margin:6px 0 0}
+.it.dinner:before{display:none}
+.it.dinner .t{color:var(--gold)}.it.dinner .ds{color:#e5e7eb}
+.btn{display:inline-block;margin-top:10px;background:var(--gold);color:#111;font-weight:700;font-size:.8rem;padding:8px 14px;border-radius:999px;text-decoration:none}
+details{margin-top:10px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
+summary{cursor:pointer;padding:10px 12px;font-weight:700;font-size:.85rem;color:var(--navy);list-style:none}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"＋";float:right}
+details[open] summary:after{content:"－"}
+.mor{width:100%;border-collapse:collapse;font-size:.78rem}
+.mor th{background:var(--navy);color:#fff;text-align:left;padding:6px 8px;font-weight:600}
+.mor td{padding:7px 8px;border-top:1px solid #e5e7eb;vertical-align:top;color:var(--ink)}
+.mor td:first-child{white-space:nowrap;font-weight:700}
+.mor tr.br td{background:#fff7e6;text-align:center;font-weight:700;color:#92400e}
+.mor ul{padding-left:14px}
+.meta{padding:10px 12px;font-size:.78rem;color:var(--mut);border-top:1px solid #e5e7eb}
+footer{text-align:center;margin-top:8px;font-size:.75rem;color:var(--mut);padding:0 0 calc(24px + env(safe-area-inset-bottom))}
+@media (max-width:980px){main,@media (max-width:480px){.dh{padding:16px}.tl{padding:14px}.mor{font-size:.72rem}.mor td,.mor th{padding:6px 5px}nav a{padding:7px 10px;font-size:.78rem}}
+</style>
+</head>
+<body>
+<header>
+  <div class="flag"><i></i><i></i><i></i></div>
+  <div class="kicker">MANCOM · Nestlé Ecuador</div>
+  <h1>Agenda QOR 2026 Q4</h1>
+  <div class="sub">MOR · QOR · Construcción del OMP 2027</div>
+  <div class="chips"><span class="chip">📅 28 – 30 de octubre 2026</span><span class="chip">📍 Guayaquil</span></div>
+</header>
+
+<nav><a class="n1" href="#d1">Mié 28</a><a class="n2" href="#d2">Jue 29</a><a class="n3" href="#d3">Vie 30</a></nav>
+
+<main>
+<!-- DÍA 1 -->
+<section class="day d1" id="d1">
+  <div class="dh"><small>Día 1 · Miércoles</small><h2>28 de octubre</h2><p>MOR simplificada + QOR</p></div>
+  <div class="tl">
+    <div class="it">
+      <div class="t">9:00 AM – 12:30 PM</div>
+      <div class="ti">MOR simplificada</div>
+      <div class="ds">Revisión de KPIs mensuales, toma y revisión de acciones, alineación.</div>
+      <details>
+        <summary>Ver agenda detallada de la MOR</summary>
+        <table class="mor">
+          <tr><th>Hora</th><th>Tema</th><th>Encargado</th></tr>
+          <tr><td>09:00–09:05</td><td>Mensajes de apertura, cascadeo</td><td>Josué de la Maza</td></tr>
+          <tr><td>09:05–09:20</td><td>Market Share – Sell Out</td><td>Majo Figueroa · Gabi Cárdenas</td></tr>
+          <tr><td>09:20–09:30</td><td>Revisión de acciones (10)</td><td>Juan Velandia</td></tr>
+          <tr><td>09:30–09:40</td><td>Indicadores financieros, acciones, watch-outs</td><td>Eduardo Figuereido</td></tr>
+          <tr><td>09:40–10:50</td><td><ul><li>Confites</li><li>Culinarios</li><li>Café &amp; CMB</li><li>Nutrition</li><li>Professional</li><li>Purina</li><li>CPW</li><li>Terrafertil</li><li>Cacao</li></ul><em>72 min · 8 min c/u</em></td><td>BEOs</td></tr>
+          <tr class="br"><td colspan="3">☕ BREAK · 10:50–10:55</td></tr>
+          <tr><td>10:55–11:30</td><td><ul><li>Value Equation 4Us</li><li>TripleA SKUs</li><li>Sell-out, inventarios, distribución, efectividad, concentración de ventas</li></ul></td><td>Andrés Chamorro · José A. Moy</td></tr>
+          <tr><td>11:30–12:00</td><td>KPIs Supply Chain · KPIs Manufacturing <em>(15 min c/u)</em></td><td>Daniel Martínez · Melina Andrade</td></tr>
+          <tr><td>12:00–12:10</td><td>Cultura y Bienestar</td><td>Lucía Chávez</td></tr>
+          <tr><td>12:10–12:20</td><td>Revisión Proyectos OMP</td><td>Sandra Morales</td></tr>
+          <tr><td>12:20–12:30</td><td>Conclusiones y cierre</td><td>Josué de la Maza</td></tr>
+        </table>
+        <div class="meta">⏱️ Time-keeper: <strong>Sandra Morales</strong></div>
+      </details>
+    </div>
+    <div class="it meal"><div class="t">12:30 PM – 2:30 PM</div><div class="ti">Lunch</div></div>
+    <div class="it">
+      <div class="t">2:30 PM – 6:30 PM</div>
+      <div class="ti">QOR · Revisión de las funciones</div>
+      <div class="ds"><ol><li>Grandes proyectos</li><li>Proyectos a concluir</li><li>Lecciones aprendidas</li><li>Conclusiones</li></ol></div>
+    </div>
+    <div class="it dinner">
+      <div class="t">7:00 PM – 10:30 PM</div>
+      <div class="ti">🍣 Cena en MIKKA · Guayaquil</div>
+      <div class="ds">Cena de integración del MANCOM.</div>
+      <a class="btn" href="https://www.mikkarestaurante.com" target="_blank" rel="noopener">Ver restaurante →</a>
+    </div>
+  </div>
+</section>
+
+<!-- DÍA 2 -->
+<section class="day d2" id="d2">
+  <div class="dh"><small>Día 2 · Jueves</small><h2>29 de octubre</h2><p>Construcción del OMP 2027</p></div>
+  <div class="tl">
+    <div class="it"><div class="t">8:30 – 8:40 AM</div><div class="ti">Apertura del ejercicio OMP 2027</div><div class="ds">Josué de la Maza</div></div>
+    <div class="it"><div class="t">8:40 AM – 12:00 PM</div><div class="ti">Grupos de trabajo OMP por prioridad</div><div class="ds">Con apoyo del AI Advisory Board (agentes Copilot).</div><span class="tag">🤖 AI-assisted</span></div>
+    <div class="it meal"><div class="t">12:00 – 1:30 PM</div><div class="ti">Lunch</div></div>
+    <div class="it"><div class="t">1:30 – 3:30 PM</div><div class="ti">Definición de proyectos MUST WIN BATTLES 2027</div></div>
+    <div class="it"><div class="t">3:30 – 5:30 PM</div><div class="ti">Definición de KPIs</div></div>
+    <div class="it"><div class="t">Por confirmar</div><div class="ti">Revisión de proyectos carry over del OMP</div></div>
+    <div class="it dinner">
+      <div class="t">7:00 PM – 11:00 PM</div>
+      <div class="ti">🏡 Cena en Casa de Teo</div>
+      <div class="ds">Cierre del día de trabajo del OMP.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DÍA 3 -->
+<section class="day d3" id="d3">
+  <div class="dh"><small>Día 3 · Viernes</small><h2>30 de octubre</h2><p>Presentación del OMP y MLT</p></div>
+  <div class="tl">
+    <div class="it"><div class="t">9:00 AM – 12:00 PM</div><div class="ti">Presentación final del OMP</div></div>
+    <div class="it meal"><div class="t">12:00 – 1:30 PM</div><div class="ti">Lunch</div></div>
+    <div class="it"><div class="t">1:30 – 3:30 PM</div><div class="ti">MLT</div></div>
+    <div class="it"><div class="t">3:30 PM</div><div class="ti">🏁 Cierre</div></div>
+  </div>
+</section>
+</main>
+
+<footer>MANCOM Nestlé Ecuador · QOR 2026 Q4</footer>
+</body>
+</html>
